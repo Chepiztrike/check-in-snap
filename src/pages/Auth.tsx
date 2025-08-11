@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Helmet } from "react-helmet-async";
+import Seo from "@/components/Seo";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -15,7 +15,6 @@ const Auth = () => {
     e.preventDefault();
     try {
       setLoading(true);
-      // Demo mode: Navigate directly. Replace with Supabase auth when configured.
       await new Promise((r) => setTimeout(r, 600));
       toast.success("Signed in (demo mode)");
       navigate("/check-in");
@@ -28,7 +27,6 @@ const Auth = () => {
     e.preventDefault();
     try {
       setLoading(true);
-      // Demo mode: Fake sign up flow
       await new Promise((r) => setTimeout(r, 600));
       toast.success("Account created (demo mode)");
     } finally {
@@ -38,11 +36,7 @@ const Auth = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background p-6">
-      <Helmet>
-        <title>Sign in | Car Check-In</title>
-        <meta name="description" content="Secure login to start the car check-in checklist" />
-        <link rel="canonical" href="/auth" />
-      </Helmet>
+      <Seo title="Sign in | Car Check-In" description="Secure login to start the car check-in checklist" canonical="/auth" />
       <div className="w-full max-w-md rounded-lg border bg-card p-6 shadow-sm">
         <h1 className="mb-2 text-2xl font-semibold">Welcome back</h1>
         <p className="mb-6 text-muted-foreground">Sign in or create an account to begin the checklist.</p>

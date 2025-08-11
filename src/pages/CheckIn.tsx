@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Helmet } from "react-helmet-async";
+import Seo from "@/components/Seo";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -70,7 +70,6 @@ const CheckIn = () => {
   }, [currentStep.key, customerName, plate, vin, mileage]);
 
   const handleFinish = () => {
-    // In a future step, save to Supabase (checkins + media paths)
     console.log("Check-in payload", {
       vehicle: { customerName, plate, vin, mileage },
       steps: data,
@@ -83,11 +82,7 @@ const CheckIn = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <Helmet>
-        <title>Check-In | Guided Car Checklist</title>
-        <meta name="description" content="Step-by-step car check-in with photos, videos, and notes." />
-        <link rel="canonical" href="/check-in" />
-      </Helmet>
+      <Seo title="Check-In | Guided Car Checklist" description="Step-by-step car check-in with photos, videos, and notes." canonical="/check-in" />
       <header className="border-b bg-card/50 backdrop-blur supports-[backdrop-filter]:bg-card/60">
         <div className="container mx-auto flex items-center justify-between py-4">
           <h1 className="text-lg font-semibold">Car Check-In</h1>

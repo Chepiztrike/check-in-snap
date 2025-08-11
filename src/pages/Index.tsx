@@ -1,15 +1,15 @@
-import { Helmet } from "react-helmet-async";
 import hero from "@/assets/hero-garage.jpg";
 import { Button } from "@/components/ui/button";
+import Seo from "@/components/Seo";
 
 const Index = () => {
   return (
     <div className="min-h-screen bg-background">
-      <Helmet>
-        <title>Car Check-In Checklist | Fast shop intake</title>
-        <meta name="description" content="Guided car check-in with photos, videos, and notes for efficient service intake." />
-        <link rel="canonical" href="/" />
-      </Helmet>
+      <Seo
+        title="Car Check-In Checklist | Fast shop intake"
+        description="Guided car check-in with photos, videos, and notes for efficient service intake."
+        canonical="/"
+      />
       <header className="container mx-auto flex items-center justify-between py-6">
         <h1 className="text-2xl font-semibold">Car Check-In</h1>
         <a href="/auth" className="text-sm text-muted-foreground hover:underline">Sign in</a>
