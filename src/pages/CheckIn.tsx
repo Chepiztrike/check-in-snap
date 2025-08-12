@@ -149,8 +149,14 @@ const CheckIn = () => {
               <div className="flex items-center justify-between">
                 <Button
                   variant="ghost"
-                  onClick={() => setStepIndex((i) => Math.max(0, i - 1))}
-                  disabled={stepIndex === 0}
+                  type="button"
+                  onClick={() => {
+                    if (stepIndex === 0) {
+                      navigate("/");
+                    } else {
+                      setStepIndex((i) => Math.max(0, i - 1));
+                    }
+                  }}
                 >
                   Back
                 </Button>
