@@ -25,6 +25,9 @@ const Index = () => {
                 <a href="/parts-service">
                   <Button variant="outline" className="px-6">Parts & Service</Button>
                 </a>
+                <a href="/check-out">
+                  <Button variant="secondary" className="px-6">Vehicle Check-Out</Button>
+                </a>
               </div>
             </div>
             <div className="relative">

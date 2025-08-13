@@ -8,6 +8,7 @@ import NotFound from "./pages/NotFound";
 import Auth from "./pages/Auth";
 import CheckIn from "./pages/CheckIn";
 import PartsService from "./pages/PartsService";
+import CheckOut from "./pages/CheckOut";
 
 const queryClient = new QueryClient();
 
@@ -22,6 +23,7 @@ const App = () => (
           <Route path="/auth" element={<Auth />} />
           <Route path="/check-in" element={<CheckIn />} />
           <Route path="/parts-service" element={<PartsService />} />
+          <Route path="/check-out" element={<CheckOut />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
