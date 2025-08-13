@@ -69,12 +69,34 @@ const CheckIn = () => {
     return true;
   }, [currentStep.key, customerName, plate, vin, mileage]);
 
+  const exportCheckInData = () => {
+    const checkInData = {
+      vehicle: { customerName, plate, vin, mileage },
+      steps: data,
+      timestamp: new Date().toISOString(),
+      checkInId: `checkin-${Date.now()}`,
+    };
+    
+    const dataStr = JSON.stringify(checkInData, null, 2);
+    const dataBlob = new Blob([dataStr], { type: "application/json" });
+    const url = URL.createObjectURL(dataBlob);
+    
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `car-checkin-${plate || "unknown"}-${new Date().toISOString().split("T")[0]}.json`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
+
   const handleFinish = () => {
     console.log("Check-in payload", {
       vehicle: { customerName, plate, vin, mileage },
       steps: data,
     });
-    toast.success("Check-in completed and saved (demo mode)");
+    exportCheckInData();
+    toast.success("Check-in completed and exported!");
     navigate("/");
   };
 
