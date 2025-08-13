@@ -126,16 +126,6 @@ All colors MUST be HSL.
 @layer utilities {
   .bg-hero-gradient {
     background: var(--gradient-primary);
-    position: relative;
-  }
-  
-  .bg-hero-gradient::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: radial-gradient(800px circle at var(--x, 50%) var(--y, 30%), 
-                hsl(var(--primary-glow) / 0.15), transparent 50%);
-    pointer-events: none;
   }
 
   .glass-effect {
