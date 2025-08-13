@@ -6,12 +6,14 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Separator } from "@/components/ui/separator";
 import MediaUploader, { MediaItem } from "@/components/checkin/MediaUploader";
+import ChecklistItemUploader from "@/components/checkin/ChecklistItemUploader";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 
 interface StepData {
   notes?: string;
   media: MediaItem[];
+  checklistMedia?: Record<number, MediaItem[]>;
 }
 
 const stepsConfig = [
@@ -107,12 +109,12 @@ const CheckIn = () => {
 
   const [data, setData] = useState<Record<StepKey, StepData | any>>({
     vehicle: {},
-    exterior: { media: [], notes: "" },
-    interior: { media: [], notes: "" },
-    engine: { media: [], notes: "" },
-    wheels: { media: [], notes: "" },
-    warnings: { media: [], notes: "" },
-    final: { media: [], notes: "" },
+    exterior: { media: [], notes: "", checklistMedia: {} },
+    interior: { media: [], notes: "", checklistMedia: {} },
+    engine: { media: [], notes: "", checklistMedia: {} },
+    wheels: { media: [], notes: "", checklistMedia: {} },
+    warnings: { media: [], notes: "", checklistMedia: {} },
+    final: { media: [], notes: "", checklistMedia: {} },
   });
 
   const currentStep = stepsConfig[stepIndex];
@@ -217,15 +219,27 @@ const CheckIn = () => {
                   {currentStep.checklist.length > 0 && (
                     <div className="space-y-3">
                       <Label>Inspection Checklist</Label>
-                      <div className="rounded-md border p-4 bg-muted/50">
-                        <ul className="space-y-2">
-                          {currentStep.checklist.map((item, index) => (
-                            <li key={index} className="flex items-start gap-2 text-sm">
-                              <span className="text-muted-foreground mt-1">•</span>
-                              <span>{item}</span>
-                            </li>
-                          ))}
-                        </ul>
+                      <div className="space-y-2">
+                        {currentStep.checklist.map((item, index) => (
+                          <ChecklistItemUploader
+                            key={index}
+                            item={item}
+                            index={index}
+                            media={data[currentStep.key]?.checklistMedia?.[index] || []}
+                            onMediaChange={(media) =>
+                              setData((prev) => ({
+                                ...prev,
+                                [currentStep.key]: {
+                                  ...prev[currentStep.key],
+                                  checklistMedia: {
+                                    ...prev[currentStep.key]?.checklistMedia,
+                                    [index]: media,
+                                  },
+                                },
+                              }))
+                            }
+                          />
+                        ))}
                       </div>
                     </div>
                   )}
