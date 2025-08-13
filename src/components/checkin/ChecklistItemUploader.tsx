@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Camera, Check } from "lucide-react";
+import { Camera, Check, Wrench, X } from "lucide-react";
 import MediaUploader, { MediaItem } from "./MediaUploader";
 
 interface ChecklistItemUploaderProps {
@@ -10,9 +10,11 @@ interface ChecklistItemUploaderProps {
   index: number;
   media: MediaItem[];
   onMediaChange: (media: MediaItem[]) => void;
+  serviceNeeded: boolean;
+  onServiceChange: (serviceNeeded: boolean) => void;
 }
 
-const ChecklistItemUploader = ({ item, index, media, onMediaChange }: ChecklistItemUploaderProps) => {
+const ChecklistItemUploader = ({ item, index, media, onMediaChange, serviceNeeded, onServiceChange }: ChecklistItemUploaderProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const hasMedia = media && media.length > 0;
 
@@ -32,11 +34,19 @@ const ChecklistItemUploader = ({ item, index, media, onMediaChange }: ChecklistI
               )}
             </div>
             <span className="flex-1 text-sm">{item}</span>
-            {hasMedia && (
-              <Badge variant="secondary" className="ml-auto">
-                {media.length}
-              </Badge>
-            )}
+            <div className="flex items-center gap-2 ml-auto">
+              {serviceNeeded && (
+                <Badge variant="default" className="bg-orange-500 hover:bg-orange-600">
+                  <Wrench className="h-3 w-3 mr-1" />
+                  Service
+                </Badge>
+              )}
+              {hasMedia && (
+                <Badge variant="secondary">
+                  {media.length}
+                </Badge>
+              )}
+            </div>
           </div>
         </Button>
       </DialogTrigger>
@@ -45,7 +55,28 @@ const ChecklistItemUploader = ({ item, index, media, onMediaChange }: ChecklistI
           <DialogTitle className="text-left">Upload Media for Checklist Item</DialogTitle>
           <p className="text-sm text-muted-foreground text-left">{item}</p>
         </DialogHeader>
-        <div className="mt-4">
+        <div className="space-y-4 mt-4">
+          <div className="flex items-center gap-2">
+            <span className="text-sm font-medium">Service needed for this item:</span>
+            <Button
+              variant={serviceNeeded ? "default" : "outline"}
+              size="sm"
+              onClick={() => onServiceChange(!serviceNeeded)}
+              className="h-8"
+            >
+              {serviceNeeded ? (
+                <>
+                  <Wrench className="h-3 w-3 mr-1" />
+                  Service Required
+                </>
+              ) : (
+                <>
+                  <X className="h-3 w-3 mr-1" />
+                  No Service
+                </>
+              )}
+            </Button>
+          </div>
           <MediaUploader
             title="Add photos/videos for this item"
             value={media || []}

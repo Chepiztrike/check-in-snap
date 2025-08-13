@@ -14,6 +14,7 @@ interface StepData {
   notes?: string;
   media: MediaItem[];
   checklistMedia?: Record<number, MediaItem[]>;
+  checklistService?: Record<number, boolean>;
 }
 
 const stepsConfig = [
@@ -114,12 +115,12 @@ const CheckIn = () => {
 
   const [data, setData] = useState<Record<StepKey, StepData | any>>({
     vehicle: {},
-    exterior: { media: [], notes: "", checklistMedia: {} },
-    interior: { media: [], notes: "", checklistMedia: {} },
-    engine: { media: [], notes: "", checklistMedia: {} },
-    wheels: { media: [], notes: "", checklistMedia: {} },
-    warnings: { media: [], notes: "", checklistMedia: {} },
-    final: { media: [], notes: "", checklistMedia: {} },
+    exterior: { media: [], notes: "", checklistMedia: {}, checklistService: {} },
+    interior: { media: [], notes: "", checklistMedia: {}, checklistService: {} },
+    engine: { media: [], notes: "", checklistMedia: {}, checklistService: {} },
+    wheels: { media: [], notes: "", checklistMedia: {}, checklistService: {} },
+    warnings: { media: [], notes: "", checklistMedia: {}, checklistService: {} },
+    final: { media: [], notes: "", checklistMedia: {}, checklistService: {} },
   });
 
   const currentStep = stepsConfig[stepIndex];
@@ -286,6 +287,7 @@ const CheckIn = () => {
                             item={item}
                             index={index}
                             media={data[currentStep.key]?.checklistMedia?.[index] || []}
+                            serviceNeeded={data[currentStep.key]?.checklistService?.[index] || false}
                             onMediaChange={(media) =>
                               setData((prev) => ({
                                 ...prev,
@@ -294,6 +296,18 @@ const CheckIn = () => {
                                   checklistMedia: {
                                     ...prev[currentStep.key]?.checklistMedia,
                                     [index]: media,
+                                  },
+                                },
+                              }))
+                            }
+                            onServiceChange={(serviceNeeded) =>
+                              setData((prev) => ({
+                                ...prev,
+                                [currentStep.key]: {
+                                  ...prev[currentStep.key],
+                                  checklistService: {
+                                    ...prev[currentStep.key]?.checklistService,
+                                    [index]: serviceNeeded,
                                   },
                                 },
                               }))
