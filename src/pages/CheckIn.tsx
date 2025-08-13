@@ -15,13 +15,82 @@ interface StepData {
 }
 
 const stepsConfig = [
-  { key: "vehicle", title: "Vehicle details" },
-  { key: "exterior", title: "Exterior condition" },
-  { key: "interior", title: "Interior condition" },
-  { key: "engine", title: "Engine bay" },
-  { key: "wheels", title: "Wheels & Tires" },
-  { key: "warnings", title: "Dash/Warning lights" },
-  { key: "final", title: "Final notes" },
+  { 
+    key: "vehicle", 
+    title: "Vehicle details",
+    checklist: []
+  },
+  { 
+    key: "exterior", 
+    title: "Exterior condition",
+    checklist: [
+      "Check for scratches, dents, or paint damage",
+      "Inspect bumpers and body panels",
+      "Examine lights (headlights, taillights, indicators)",
+      "Look for rust or corrosion",
+      "Check mirrors and glass condition",
+      "Document any existing damage"
+    ]
+  },
+  { 
+    key: "interior", 
+    title: "Interior condition",
+    checklist: [
+      "Test all seats and adjustments",
+      "Check dashboard and instrument cluster",
+      "Verify air conditioning/heating works",
+      "Test radio, infotainment system",
+      "Inspect upholstery for tears or stains",
+      "Check seatbelts and safety features"
+    ]
+  },
+  { 
+    key: "engine", 
+    title: "Engine bay",
+    checklist: [
+      "Check fluid levels (oil, coolant, brake fluid)",
+      "Inspect belts and hoses for wear",
+      "Look for leaks or corrosion",
+      "Check battery terminals and condition",
+      "Examine air filter condition",
+      "Note any unusual sounds or smells"
+    ]
+  },
+  { 
+    key: "wheels", 
+    title: "Wheels & Tires",
+    checklist: [
+      "Check tire tread depth and wear patterns",
+      "Inspect for cuts, bulges, or damage",
+      "Verify proper tire pressure",
+      "Examine wheel rims for damage",
+      "Check spare tire condition",
+      "Look for any signs of alignment issues"
+    ]
+  },
+  { 
+    key: "warnings", 
+    title: "Dash/Warning lights",
+    checklist: [
+      "Check engine light status",
+      "Verify all dashboard lights function",
+      "Note any active warning lights",
+      "Test hazard lights and indicators",
+      "Check fuel gauge and other gauges",
+      "Document any error codes or messages"
+    ]
+  },
+  { 
+    key: "final", 
+    title: "Final notes",
+    checklist: [
+      "Overall vehicle condition assessment",
+      "Any additional concerns or observations",
+      "Customer-specific requests or notes",
+      "Recommended maintenance or repairs",
+      "Schedule follow-up if needed"
+    ]
+  },
 ] as const;
 
 type StepKey = typeof stepsConfig[number]["key"];
@@ -95,8 +164,7 @@ const CheckIn = () => {
       vehicle: { customerName, plate, vin, mileage },
       steps: data,
     });
-    exportCheckInData();
-    toast.success("Check-in completed and exported!");
+    toast.success("Check-in completed!");
     navigate("/");
   };
 
@@ -146,6 +214,21 @@ const CheckIn = () => {
                 </div>
               ) : (
                 <div className="space-y-6">
+                  {currentStep.checklist.length > 0 && (
+                    <div className="space-y-3">
+                      <Label>Inspection Checklist</Label>
+                      <div className="rounded-md border p-4 bg-muted/50">
+                        <ul className="space-y-2">
+                          {currentStep.checklist.map((item, index) => (
+                            <li key={index} className="flex items-start gap-2 text-sm">
+                              <span className="text-muted-foreground mt-1">•</span>
+                              <span>{item}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    </div>
+                  )}
                   <MediaUploader
                     title="Upload photos/videos"
                     value={data[currentStep.key]?.media || []}
@@ -187,9 +270,14 @@ const CheckIn = () => {
                     Next
                   </Button>
                 ) : (
-                  <Button variant="default" onClick={handleFinish}>
-                    Finish check-in
-                  </Button>
+                  <div className="flex gap-2">
+                    <Button variant="outline" onClick={exportCheckInData}>
+                      Export Data
+                    </Button>
+                    <Button variant="default" onClick={handleFinish}>
+                      Finish check-in
+                    </Button>
+                  </div>
                 )}
               </div>
             </div>
