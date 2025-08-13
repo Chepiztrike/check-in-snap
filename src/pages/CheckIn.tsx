@@ -103,9 +103,13 @@ const CheckIn = () => {
 
   // Vehicle fields
   const [customerName, setCustomerName] = useState("");
+  const [customerPhone, setCustomerPhone] = useState("");
+  const [customerEmail, setCustomerEmail] = useState("");
   const [plate, setPlate] = useState("");
   const [vin, setVin] = useState("");
   const [mileage, setMileage] = useState("");
+  const [carModel, setCarModel] = useState("");
+  const [carYear, setCarYear] = useState("");
 
   const [data, setData] = useState<Record<StepKey, StepData | any>>({
     vehicle: {},
@@ -135,14 +139,23 @@ const CheckIn = () => {
 
   const canNext = useMemo(() => {
     if (currentStep.key === "vehicle") {
-      return Boolean(customerName && plate && vin && mileage);
+      return Boolean(customerName && customerPhone && customerEmail && plate && vin && mileage && carModel && carYear);
     }
     return true;
-  }, [currentStep.key, customerName, plate, vin, mileage]);
+  }, [currentStep.key, customerName, customerPhone, customerEmail, plate, vin, mileage, carModel, carYear]);
 
   const exportCheckInData = () => {
     const checkInData = {
-      vehicle: { customerName, plate, vin, mileage },
+      vehicle: { 
+        customerName, 
+        customerPhone, 
+        customerEmail, 
+        plate, 
+        vin, 
+        mileage, 
+        carModel, 
+        carYear 
+      },
       steps: data,
       timestamp: new Date().toISOString(),
       checkInId: `checkin-${Date.now()}`,
@@ -196,22 +209,63 @@ const CheckIn = () => {
 
             <div className="rounded-lg border bg-card p-5 shadow-sm">
               {currentStep.key === "vehicle" ? (
-                <div className="grid gap-4 sm:grid-cols-2">
-                  <div className="space-y-2">
-                    <Label htmlFor="customer">Customer name</Label>
-                    <Input id="customer" value={customerName} onChange={(e) => setCustomerName(e.target.value)} />
+                <div className="space-y-6">
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    <div className="space-y-2">
+                      <Label htmlFor="customer">Customer name *</Label>
+                      <Input id="customer" value={customerName} onChange={(e) => setCustomerName(e.target.value)} />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="phone">Phone number *</Label>
+                      <Input id="phone" type="tel" value={customerPhone} onChange={(e) => setCustomerPhone(e.target.value)} />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="email">Email address *</Label>
+                      <Input id="email" type="email" value={customerEmail} onChange={(e) => setCustomerEmail(e.target.value)} />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="plate">License plate *</Label>
+                      <Input id="plate" value={plate} onChange={(e) => setPlate(e.target.value)} />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="model">Car model *</Label>
+                      <Input id="model" placeholder="e.g., Honda Civic" value={carModel} onChange={(e) => setCarModel(e.target.value)} />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="year">Car year *</Label>
+                      <Input id="year" placeholder="e.g., 2020" value={carYear} onChange={(e) => setCarYear(e.target.value)} />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="vin">VIN *</Label>
+                      <Input id="vin" value={vin} onChange={(e) => setVin(e.target.value)} />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="mileage">Mileage *</Label>
+                      <Input id="mileage" value={mileage} onChange={(e) => setMileage(e.target.value)} />
+                    </div>
                   </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="plate">License plate</Label>
-                    <Input id="plate" value={plate} onChange={(e) => setPlate(e.target.value)} />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="vin">VIN</Label>
-                    <Input id="vin" value={vin} onChange={(e) => setVin(e.target.value)} />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="mileage">Mileage</Label>
-                    <Input id="mileage" value={mileage} onChange={(e) => setMileage(e.target.value)} />
+                  
+                  <div className="space-y-4">
+                    <div className="space-y-2">
+                      <Label>Vehicle Documentation</Label>
+                      <div className="rounded-lg border border-dashed bg-muted/30 p-4">
+                        <div className="mb-3 text-sm text-muted-foreground">
+                          <p className="font-medium mb-2">Required media for vehicle intake:</p>
+                          <ul className="list-disc list-inside space-y-1 text-xs">
+                            <li><strong>360° video:</strong> Walk around the entire vehicle recording exterior</li>
+                            <li><strong>Interior video:</strong> Record dashboard, seats, and all interior areas</li>
+                            <li><strong>Documentation photos:</strong> License plate, VIN plate, odometer</li>
+                          </ul>
+                        </div>
+                        <MediaUploader
+                          title="Upload vehicle documentation"
+                          value={data.vehicle?.media || []}
+                          onChange={(items) =>
+                            setData((prev) => ({ ...prev, vehicle: { ...prev.vehicle, media: items } }))
+                          }
+                        />
+                      </div>
+                    </div>
                   </div>
                 </div>
               ) : (
