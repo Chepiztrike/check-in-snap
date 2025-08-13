@@ -110,6 +110,7 @@ const CheckIn = () => {
   const [mileage, setMileage] = useState("");
   const [carModel, setCarModel] = useState("");
   const [carYear, setCarYear] = useState("");
+  const [entryDate, setEntryDate] = useState(new Date().toISOString().split('T')[0]);
 
   const [data, setData] = useState<Record<StepKey, StepData | any>>({
     vehicle: {},
@@ -139,10 +140,10 @@ const CheckIn = () => {
 
   const canNext = useMemo(() => {
     if (currentStep.key === "vehicle") {
-      return Boolean(customerName && customerPhone && customerEmail && plate && vin && mileage && carModel && carYear);
+      return Boolean(customerName && customerPhone && customerEmail && plate && vin && mileage && carModel && carYear && entryDate);
     }
     return true;
-  }, [currentStep.key, customerName, customerPhone, customerEmail, plate, vin, mileage, carModel, carYear]);
+  }, [currentStep.key, customerName, customerPhone, customerEmail, plate, vin, mileage, carModel, carYear, entryDate]);
 
   const exportCheckInData = () => {
     const checkInData = {
@@ -154,7 +155,8 @@ const CheckIn = () => {
         vin, 
         mileage, 
         carModel, 
-        carYear 
+        carYear,
+        entryDate 
       },
       steps: data,
       timestamp: new Date().toISOString(),
@@ -242,6 +244,10 @@ const CheckIn = () => {
                     <div className="space-y-2">
                       <Label htmlFor="mileage">Mileage *</Label>
                       <Input id="mileage" value={mileage} onChange={(e) => setMileage(e.target.value)} />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="entryDate">Entry date *</Label>
+                      <Input id="entryDate" type="date" value={entryDate} onChange={(e) => setEntryDate(e.target.value)} />
                     </div>
                   </div>
                   
