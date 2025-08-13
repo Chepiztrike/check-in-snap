@@ -22,8 +22,8 @@ const Index = () => {
                 <a href="/check-in">
                   <Button variant="hero" className="px-6">Start Check-In</Button>
                 </a>
-                <a href="/check-in">
-                  
+                <a href="/parts-service">
+                  <Button variant="outline" className="px-6">Parts & Service</Button>
                 </a>
               </div>
             </div>
