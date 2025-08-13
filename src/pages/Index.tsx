@@ -11,21 +11,21 @@ const Index = () => {
       title: "Check-In Process",
       description: "Complete vehicle inspection with photo documentation",
       href: "/check-in",
-      variant: "premium" as const
+      variant: "default" as const
     },
     {
       icon: Wrench,
       title: "Parts & Service",
       description: "Document parts usage and service procedures",
       href: "/parts-service",
-      variant: "glass" as const
+      variant: "default" as const
     },
     {
       icon: Car,
       title: "Vehicle Check-Out",
       description: "Customer approval and quality verification",
       href: "/check-out",
-      variant: "glass" as const
+      variant: "default" as const
     }
   ];
 
@@ -51,19 +51,20 @@ const Index = () => {
       <main>
         {/* Hero Section */}
         <section className="relative overflow-hidden">
-          <div className="absolute inset-0 bg-hero-gradient opacity-60" aria-hidden="true" />
           <div className="container relative z-10 mx-auto py-20">
             <div className="text-center space-y-8 max-w-4xl mx-auto">
-              <h2 className="text-5xl md:text-6xl font-bold leading-tight bg-gradient-to-r from-foreground via-primary to-accent bg-clip-text text-transparent">
-                Streamlined Car Service
-                <span className="block text-4xl md:text-5xl mt-2 font-semibold">
-                  Every Time
-                </span>
-              </h2>
-              <p className="text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-                Professional vehicle documentation system with guided checklists, media capture, 
-                and comprehensive reporting for modern auto service centers.
-              </p>
+              <div className="bg-gradient-to-br from-primary to-accent p-16 rounded-2xl shadow-2xl">
+                <h2 className="text-5xl md:text-6xl font-bold leading-tight text-white">
+                  Streamlined Car Service
+                  <span className="block text-4xl md:text-5xl mt-2 font-semibold">
+                    Every Time
+                  </span>
+                </h2>
+                <p className="text-xl text-white/90 max-w-2xl mx-auto leading-relaxed mt-6">
+                  Professional vehicle documentation system with guided checklists, media capture, 
+                  and comprehensive reporting for modern auto service centers.
+                </p>
+              </div>
             </div>
           </div>
         </section>
