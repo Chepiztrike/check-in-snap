@@ -102,7 +102,73 @@ const translations = {
     'enter.car.model': 'Enter car model',
     'enter.year': 'Enter year',
     'enter.license.plate': 'Enter license plate',
-    'enter.final.mileage': 'Enter final mileage'
+    'enter.final.mileage': 'Enter final mileage',
+    
+    // Checklist items - Exterior
+    'check.scratches.dents': 'Check for scratches, dents, or paint damage',
+    'inspect.bumpers.panels': 'Inspect bumpers and body panels',
+    'examine.lights': 'Examine lights (headlights, taillights, indicators)',
+    'look.rust.corrosion': 'Look for rust or corrosion',
+    'check.mirrors.glass': 'Check mirrors and glass condition',
+    'document.existing.damage': 'Document any existing damage',
+    
+    // Checklist items - Interior
+    'test.seats.adjustments': 'Test all seats and adjustments',
+    'check.dashboard.cluster': 'Check dashboard and instrument cluster',
+    'verify.ac.heating': 'Verify air conditioning/heating works',
+    'test.radio.infotainment': 'Test radio, infotainment system',
+    'inspect.upholstery': 'Inspect upholstery for tears or stains',
+    'check.seatbelts.safety': 'Check seatbelts and safety features',
+    
+    // Checklist items - Engine
+    'check.fluid.levels': 'Check fluid levels (oil, coolant, brake fluid)',
+    'inspect.belts.hoses': 'Inspect belts and hoses for wear',
+    'look.leaks.corrosion': 'Look for leaks or corrosion',
+    'check.battery.terminals': 'Check battery terminals and condition',
+    'examine.air.filter': 'Examine air filter condition',
+    'note.unusual.sounds': 'Note any unusual sounds or smells',
+    
+    // Checklist items - Wheels
+    'check.tire.tread': 'Check tire tread depth and wear patterns',
+    'inspect.cuts.bulges': 'Inspect for cuts, bulges, or damage',
+    'verify.tire.pressure': 'Verify proper tire pressure',
+    'examine.wheel.rims': 'Examine wheel rims for damage',
+    'check.spare.tire': 'Check spare tire condition',
+    'look.alignment.issues': 'Look for any signs of alignment issues',
+    
+    // Checklist items - Warnings
+    'check.engine.light': 'Check engine light status',
+    'verify.dashboard.lights': 'Verify all dashboard lights function',
+    'note.active.warnings': 'Note any active warning lights',
+    'test.hazard.indicators': 'Test hazard lights and indicators',
+    'check.fuel.gauges': 'Check fuel gauge and other gauges',
+    'document.error.codes': 'Document any error codes or messages',
+    
+    // Checklist items - Final
+    'overall.vehicle.assessment': 'Overall vehicle condition assessment',
+    'additional.concerns': 'Any additional concerns or observations',
+    'customer.specific.requests': 'Customer-specific requests or notes',
+    'recommended.maintenance': 'Recommended maintenance or repairs',
+    'schedule.followup': 'Schedule follow-up if needed',
+    
+    // Instructions and bullets
+    '360.video.instruction': '360° video: Walk around the entire vehicle recording exterior',
+    'interior.video.instruction': 'Interior video: Record dashboard, seats, and all interior areas',
+    'documentation.photos.instruction': 'Documentation photos: License plate, VIN plate, odometer',
+    
+    // Checkout items
+    'exterior.no.damage': 'Exterior condition - no new damage',
+    'interior.cleanliness': 'Interior cleanliness and condition',
+    'lights.functioning': 'All lights functioning properly',
+    'engine.compartment.inspection': 'Engine compartment inspection',
+    'fluid.levels.checked': 'Fluid levels checked',
+    'tire.condition.pressure': 'Tire condition and pressure',
+    'battery.terminals.connections': 'Battery terminals and connections',
+    'windshield.mirrors.clean': 'Windshield and mirrors clean',
+    'service.work.completed': 'Service work completed as requested',
+    'tools.equipment.removed': 'All tools and equipment removed',
+    'test.drive.completed': 'Test drive completed successfully',
+    'customer.walkthrough.completed': 'Customer walkthrough completed'
   },
   es: {
     // Index page
@@ -197,21 +263,96 @@ const translations = {
     'enter.car.model': 'Ingrese modelo del auto',
     'enter.year': 'Ingrese año',
     'enter.license.plate': 'Ingrese placa del vehículo',
-    'enter.final.mileage': 'Ingrese kilometraje final'
+    'enter.final.mileage': 'Ingrese kilometraje final',
+    
+    // Checklist items - Exterior
+    'check.scratches.dents': 'Verificar rayones, abolladuras o daños en la pintura',
+    'inspect.bumpers.panels': 'Inspeccionar parachoques y paneles de carrocería',
+    'examine.lights': 'Examinar luces (faros, luces traseras, indicadores)',
+    'look.rust.corrosion': 'Buscar óxido o corrosión',
+    'check.mirrors.glass': 'Verificar condición de espejos y cristales',
+    'document.existing.damage': 'Documentar cualquier daño existente',
+    
+    // Checklist items - Interior
+    'test.seats.adjustments': 'Probar todos los asientos y ajustes',
+    'check.dashboard.cluster': 'Verificar tablero e instrumentos',
+    'verify.ac.heating': 'Verificar que funcione el aire acondicionado/calefacción',
+    'test.radio.infotainment': 'Probar radio y sistema de infoentretenimiento',
+    'inspect.upholstery': 'Inspeccionar tapicería por desgarros o manchas',
+    'check.seatbelts.safety': 'Verificar cinturones de seguridad y características de seguridad',
+    
+    // Checklist items - Engine
+    'check.fluid.levels': 'Verificar niveles de fluidos (aceite, refrigerante, líquido de frenos)',
+    'inspect.belts.hoses': 'Inspeccionar correas y mangueras por desgaste',
+    'look.leaks.corrosion': 'Buscar fugas o corrosión',
+    'check.battery.terminals': 'Verificar terminales y condición de la batería',
+    'examine.air.filter': 'Examinar condición del filtro de aire',
+    'note.unusual.sounds': 'Anotar cualquier sonido o olor inusual',
+    
+    // Checklist items - Wheels
+    'check.tire.tread': 'Verificar profundidad y patrones de desgaste de las llantas',
+    'inspect.cuts.bulges': 'Inspeccionar por cortes, protuberancias o daños',
+    'verify.tire.pressure': 'Verificar presión adecuada de las llantas',
+    'examine.wheel.rims': 'Examinar rines por daños',
+    'check.spare.tire': 'Verificar condición de la llanta de refacción',
+    'look.alignment.issues': 'Buscar signos de problemas de alineación',
+    
+    // Checklist items - Warnings
+    'check.engine.light': 'Estado de la luz de verificación del motor',
+    'verify.dashboard.lights': 'Verificar que funcionen todas las luces del tablero',
+    'note.active.warnings': 'Anotar cualquier luz de advertencia activa',
+    'test.hazard.indicators': 'Probar luces de emergencia e indicadores',
+    'check.fuel.gauges': 'Verificar medidor de combustible y otros indicadores',
+    'document.error.codes': 'Documentar códigos de error o mensajes',
+    
+    // Checklist items - Final
+    'overall.vehicle.assessment': 'Evaluación general de la condición del vehículo',
+    'additional.concerns': 'Cualquier preocupación u observación adicional',
+    'customer.specific.requests': 'Solicitudes o notas específicas del cliente',
+    'recommended.maintenance': 'Mantenimiento o reparaciones recomendadas',
+    'schedule.followup': 'Programar seguimiento si es necesario',
+    
+    // Instructions and bullets
+    '360.video.instruction': 'Video 360°: Caminar alrededor del vehículo grabando el exterior',
+    'interior.video.instruction': 'Video interior: Grabar tablero, asientos y todas las áreas interiores',
+    'documentation.photos.instruction': 'Fotos de documentación: Placa, placa VIN, odómetro',
+    
+    // Checkout items
+    'exterior.no.damage': 'Condición exterior - sin daños nuevos',
+    'interior.cleanliness': 'Limpieza y condición interior',
+    'lights.functioning': 'Todas las luces funcionando correctamente',
+    'engine.compartment.inspection': 'Inspección del compartimento del motor',
+    'fluid.levels.checked': 'Niveles de fluidos verificados',
+    'tire.condition.pressure': 'Condición y presión de las llantas',
+    'battery.terminals.connections': 'Terminales y conexiones de la batería',
+    'windshield.mirrors.clean': 'Parabrisas y espejos limpios',
+    'service.work.completed': 'Trabajo de servicio completado según solicitado',
+    'tools.equipment.removed': 'Todas las herramientas y equipo removidos',
+    'test.drive.completed': 'Prueba de manejo completada exitosamente',
+    'customer.walkthrough.completed': 'Recorrido con el cliente completado'
   }
 };
 
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
 
 export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [language, setLanguage] = useState<Language>('en');
+  const [language, setLanguage] = useState<Language>(() => {
+    // Check localStorage for saved language preference
+    const saved = localStorage.getItem('app-language');
+    return (saved as Language) || 'en';
+  });
 
   const t = (key: string): string => {
     return translations[language][key as keyof typeof translations['en']] || key;
   };
 
+  const handleSetLanguage = (lang: Language) => {
+    setLanguage(lang);
+    localStorage.setItem('app-language', lang);
+  };
+
   return (
-    <LanguageContext.Provider value={{ language, setLanguage, t }}>
+    <LanguageContext.Provider value={{ language, setLanguage: handleSetLanguage, t }}>
       {children}
     </LanguageContext.Provider>
   );

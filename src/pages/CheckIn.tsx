@@ -24,27 +24,68 @@ const getStepsConfig = (t: (key: string) => string) => [{
 }, {
   key: "exterior",
   title: t('exterior.condition'),
-  checklist: ["Check for scratches, dents, or paint damage", "Inspect bumpers and body panels", "Examine lights (headlights, taillights, indicators)", "Look for rust or corrosion", "Check mirrors and glass condition", "Document any existing damage"]
+  checklist: [
+    t('check.scratches.dents'),
+    t('inspect.bumpers.panels'),
+    t('examine.lights'),
+    t('look.rust.corrosion'),
+    t('check.mirrors.glass'),
+    t('document.existing.damage')
+  ]
 }, {
   key: "interior",
   title: t('interior.condition'),
-  checklist: ["Test all seats and adjustments", "Check dashboard and instrument cluster", "Verify air conditioning/heating works", "Test radio, infotainment system", "Inspect upholstery for tears or stains", "Check seatbelts and safety features"]
+  checklist: [
+    t('test.seats.adjustments'),
+    t('check.dashboard.cluster'),
+    t('verify.ac.heating'),
+    t('test.radio.infotainment'),
+    t('inspect.upholstery'),
+    t('check.seatbelts.safety')
+  ]
 }, {
   key: "engine",
   title: t('engine.bay'),
-  checklist: ["Check fluid levels (oil, coolant, brake fluid)", "Inspect belts and hoses for wear", "Look for leaks or corrosion", "Check battery terminals and condition", "Examine air filter condition", "Note any unusual sounds or smells"]
+  checklist: [
+    t('check.fluid.levels'),
+    t('inspect.belts.hoses'),
+    t('look.leaks.corrosion'),
+    t('check.battery.terminals'),
+    t('examine.air.filter'),
+    t('note.unusual.sounds')
+  ]
 }, {
   key: "wheels",
   title: t('wheels.tires'),
-  checklist: ["Check tire tread depth and wear patterns", "Inspect for cuts, bulges, or damage", "Verify proper tire pressure", "Examine wheel rims for damage", "Check spare tire condition", "Look for any signs of alignment issues"]
+  checklist: [
+    t('check.tire.tread'),
+    t('inspect.cuts.bulges'),
+    t('verify.tire.pressure'),
+    t('examine.wheel.rims'),
+    t('check.spare.tire'),
+    t('look.alignment.issues')
+  ]
 }, {
   key: "warnings",
   title: t('dash.warning.lights'),
-  checklist: ["Check engine light status", "Verify all dashboard lights function", "Note any active warning lights", "Test hazard lights and indicators", "Check fuel gauge and other gauges", "Document any error codes or messages"]
+  checklist: [
+    t('check.engine.light'),
+    t('verify.dashboard.lights'),
+    t('note.active.warnings'),
+    t('test.hazard.indicators'),
+    t('check.fuel.gauges'),
+    t('document.error.codes')
+  ]
 }, {
   key: "final",
   title: t('final.notes'),
-  checklist: ["Overall vehicle condition assessment", "Any additional concerns or observations", "Customer-specific requests or notes", "Recommended maintenance or repairs", "Schedule follow-up if needed"]
+  checklist: [
+    t('overall.vehicle.assessment'),
+    t('additional.concerns'),
+    t('customer.specific.requests'),
+    t('recommended.maintenance'),
+    t('schedule.followup')
+  ]
 }] as const;
 type StepKey = "vehicle" | "exterior" | "interior" | "engine" | "wheels" | "warnings" | "final";
 const CheckIn = () => {
@@ -237,9 +278,9 @@ const CheckIn = () => {
                         <div className="mb-3 text-sm text-muted-foreground">
                           <p className="font-medium mb-2">{t('required.media.intake')}</p>
                           <ul className="list-disc list-inside space-y-1 text-xs">
-                            <li><strong>360° video:</strong> Walk around the entire vehicle recording exterior</li>
-                            <li><strong>Interior video:</strong> Record dashboard, seats, and all interior areas</li>
-                            <li><strong>Documentation photos:</strong> License plate, VIN plate, odometer</li>
+                            <li><strong>{t('360.video.instruction')}</strong></li>
+                            <li><strong>{t('interior.video.instruction')}</strong></li>
+                            <li><strong>{t('documentation.photos.instruction')}</strong></li>
                           </ul>
                         </div>
                         <MediaUploader title={t('upload.vehicle.documentation')} value={data.vehicle?.media || []} onChange={items => setData(prev => ({

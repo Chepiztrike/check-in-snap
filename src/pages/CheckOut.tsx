@@ -27,23 +27,24 @@ interface VehicleDetails {
   mileage: string;
 }
 
-const checkoutItems = [
-  "Exterior condition - no new damage",
-  "Interior cleanliness and condition", 
-  "All lights functioning properly",
-  "Engine compartment inspection",
-  "Fluid levels checked",
-  "Tire condition and pressure",
-  "Battery terminals and connections",
-  "Windshield and mirrors clean",
-  "Service work completed as requested",
-  "All tools and equipment removed",
-  "Test drive completed successfully",
-  "Customer walkthrough completed"
+const getCheckoutItems = (t: (key: string) => string) => [
+  t('exterior.no.damage'),
+  t('interior.cleanliness'),
+  t('lights.functioning'),
+  t('engine.compartment.inspection'),
+  t('fluid.levels.checked'),
+  t('tire.condition.pressure'),
+  t('battery.terminals.connections'),
+  t('windshield.mirrors.clean'),
+  t('service.work.completed'),
+  t('tools.equipment.removed'),
+  t('test.drive.completed'),
+  t('customer.walkthrough.completed')
 ];
 
 const CheckOut = () => {
   const { t } = useLanguage();
+  const checkoutItems = getCheckoutItems(t);
   const [vehicleDetails, setVehicleDetails] = useState<VehicleDetails>({
     customerName: "",
     customerPhone: "",
