@@ -3,27 +3,31 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import Seo from "@/components/Seo";
 import { CheckCircle, Wrench, Car } from "lucide-react";
+import { useLanguage } from "@/contexts/LanguageContext";
+import LanguageToggle from "@/components/LanguageToggle";
 
 const Index = () => {
+  const { t } = useLanguage();
+  
   const features = [
     {
       icon: CheckCircle,
-      title: "Check-In Process",
-      description: "Complete vehicle inspection with photo documentation",
+      title: t('checkin.process'),
+      description: t('checkin.description'),
       href: "/check-in",
       variant: "default" as const
     },
     {
       icon: Wrench,
-      title: "Parts & Service",
-      description: "Document parts usage and service procedures",
+      title: t('parts.service'),
+      description: t('parts.description'),
       href: "/parts-service",
       variant: "default" as const
     },
     {
       icon: Car,
-      title: "Vehicle Check-Out",
-      description: "Customer approval and quality verification",
+      title: t('vehicle.checkout'),
+      description: t('checkout.description'),
       href: "/check-out",
       variant: "default" as const
     }
@@ -40,11 +44,14 @@ const Index = () => {
       {/* Header */}
       <header className="container mx-auto flex items-center justify-between py-6 backdrop-blur-sm">
         <h1 className="text-2xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-          AutoCheck Pro
+          {t('autocheck.pro')}
         </h1>
-        <a href="/auth" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
-          Sign in
-        </a>
+        <div className="flex items-center gap-4">
+          <LanguageToggle />
+          <a href="/auth" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+            {t('sign.in')}
+          </a>
+        </div>
       </header>
 
       {/* Main Content */}
@@ -55,14 +62,13 @@ const Index = () => {
             <div className="text-center space-y-8 max-w-4xl mx-auto">
               <div className="bg-gradient-to-br from-primary to-accent p-16 rounded-2xl shadow-2xl">
                 <h2 className="text-5xl md:text-6xl font-bold leading-tight text-white">
-                  Streamlined Car Service
+                  {t('streamlined.car.service')}
                   <span className="block text-4xl md:text-5xl mt-2 font-semibold">
-                    Every Time
+                    {t('every.time')}
                   </span>
                 </h2>
                 <p className="text-xl text-white/90 max-w-2xl mx-auto leading-relaxed mt-6">
-                  Professional vehicle documentation system with guided checklists, media capture, 
-                  and comprehensive reporting for modern auto service centers.
+                  {t('professional.vehicle.description')}
                 </p>
               </div>
             </div>
@@ -99,7 +105,7 @@ const Index = () => {
                         className="w-full font-medium"
                         size="lg"
                       >
-                        Get Started
+                        {t('get.started')}
                       </Button>
                     </a>
                   </CardContent>
@@ -113,10 +119,10 @@ const Index = () => {
         <section className="container mx-auto py-16 text-center">
           <div className="space-y-6 max-w-2xl mx-auto">
             <h3 className="text-3xl font-bold text-foreground">
-              Ready to Transform Your Service Process?
+              {t('ready.transform')}
             </h3>
             <p className="text-lg text-muted-foreground">
-              Start with any workflow that fits your current needs.
+              {t('start.workflow')}
             </p>
           </div>
         </section>
