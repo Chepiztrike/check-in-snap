@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Trash2, Wrench } from "lucide-react";
 import MediaUploader, { MediaItem } from "@/components/checkin/MediaUploader";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface PartEntry {
   id: string;
@@ -22,6 +23,7 @@ interface PartsItemUploaderProps {
 }
 
 const PartsItemUploader = ({ part, onUpdate, onRemove }: PartsItemUploaderProps) => {
+  const { t } = useLanguage();
   const hasMedia = part.media && part.media.length > 0;
 
   return (
@@ -30,10 +32,10 @@ const PartsItemUploader = ({ part, onUpdate, onRemove }: PartsItemUploaderProps)
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Wrench className="h-4 w-4 text-primary" />
-            <span className="font-medium">Service Part</span>
+            <span className="font-medium">{t('service.part')}</span>
             {hasMedia && (
               <Badge variant="secondary">
-                {part.media.length} file{part.media.length !== 1 ? 's' : ''}
+                {part.media.length} {part.media.length === 1 ? t('file') : t('files')}
               </Badge>
             )}
           </div>
@@ -50,39 +52,39 @@ const PartsItemUploader = ({ part, onUpdate, onRemove }: PartsItemUploaderProps)
       <CardContent className="space-y-4">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <Label htmlFor={`serial-${part.id}`}>Serial Number</Label>
+            <Label htmlFor={`serial-${part.id}`}>{t('serial.number')}</Label>
             <Input
               id={`serial-${part.id}`}
               value={part.serialNumber}
               onChange={(e) => onUpdate('serialNumber', e.target.value)}
-              placeholder="Enter part serial number"
+              placeholder={t('enter.part.serial')}
             />
           </div>
           <div>
-            <Label htmlFor={`name-${part.id}`}>Part Name</Label>
+            <Label htmlFor={`name-${part.id}`}>{t('part.name')}</Label>
             <Input
               id={`name-${part.id}`}
               value={part.partName}
               onChange={(e) => onUpdate('partName', e.target.value)}
-              placeholder="Enter part name/description"
+              placeholder={t('enter.part.name')}
             />
           </div>
         </div>
         
         <div>
-          <Label htmlFor={`justification-${part.id}`}>Justification for Use</Label>
+          <Label htmlFor={`justification-${part.id}`}>{t('justification.use')}</Label>
           <Textarea
             id={`justification-${part.id}`}
             value={part.justification}
             onChange={(e) => onUpdate('justification', e.target.value)}
-            placeholder="Explain why this part was used, what issue it addresses, etc."
+            placeholder={t('explain.part.use')}
             rows={3}
           />
         </div>
 
         <div>
           <MediaUploader
-            title="Upload proof of part installation"
+            title={t('upload.proof.installation')}
             value={part.media}
             onChange={(media) => onUpdate('media', media)}
           />
