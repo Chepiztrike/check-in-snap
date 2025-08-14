@@ -8,6 +8,8 @@ import { Download, ArrowLeft } from "lucide-react";
 import Seo from "@/components/Seo";
 import CheckoutItemUploader from "@/components/checkout/CheckoutItemUploader";
 import MediaUploader, { MediaItem } from "@/components/checkin/MediaUploader";
+import { useLanguage } from "@/contexts/LanguageContext";
+import LanguageToggle from "@/components/LanguageToggle";
 
 interface CheckoutItemData {
   media: MediaItem[];
@@ -41,6 +43,7 @@ const checkoutItems = [
 ];
 
 const CheckOut = () => {
+  const { t } = useLanguage();
   const [vehicleDetails, setVehicleDetails] = useState<VehicleDetails>({
     customerName: "",
     customerPhone: "",
@@ -92,8 +95,8 @@ const CheckOut = () => {
     linkElement.click();
 
     toast({
-      title: "Checkout data exported successfully",
-      description: "Vehicle checkout data has been downloaded as JSON file.",
+      title: t('checkout.data.exported'),
+      description: t('vehicle.checkout.downloaded'),
     });
   };
 
@@ -113,73 +116,76 @@ const CheckOut = () => {
           <a href="/">
             <Button variant="ghost" size="sm">
               <ArrowLeft className="h-4 w-4 mr-2" />
-              Back
+              {t('back')}
             </Button>
           </a>
-          <h1 className="text-2xl font-semibold">Vehicle Check-Out</h1>
+          <h1 className="text-2xl font-semibold">{t('vehicle.checkout.page')}</h1>
         </div>
-        <Button onClick={handleExport} className="gap-2">
-          <Download className="h-4 w-4" />
-          Export Data
-        </Button>
+        <div className="flex items-center gap-4">
+          <Button onClick={handleExport} className="gap-2">
+            <Download className="h-4 w-4" />
+            {t('export.data')}
+          </Button>
+          <LanguageToggle />
+        </div>
       </header>
 
       <main className="container mx-auto space-y-8 pb-8">
         {/* Vehicle Details */}
         <Card>
           <CardHeader>
-            <CardTitle>Vehicle Details</CardTitle>
+            <CardTitle>{t('vehicle.details')}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <Label htmlFor="customerName">Customer Name</Label>
+                <Label htmlFor="customerName">{t('customer.name')}</Label>
                 <Input
                   id="customerName"
                   value={vehicleDetails.customerName}
                   onChange={(e) => setVehicleDetails({...vehicleDetails, customerName: e.target.value})}
-                  placeholder="Enter customer name"
+                  placeholder={t('enter.customer.name')}
                 />
               </div>
               <div>
-                <Label htmlFor="customerPhone">Phone Number</Label>
+                <Label htmlFor="customerPhone">{t('phone.number')}</Label>
                 <Input
                   id="customerPhone"
                   value={vehicleDetails.customerPhone}
                   onChange={(e) => setVehicleDetails({...vehicleDetails, customerPhone: e.target.value})}
-                  placeholder="Enter phone number"
+                  placeholder={t('enter.phone.number')}
                 />
               </div>
               <div>
-                <Label htmlFor="customerEmail">Email</Label>
+                <Label htmlFor="customerEmail">{t('email')}</Label>
                 <Input
                   id="customerEmail"
                   type="email"
                   value={vehicleDetails.customerEmail}
                   onChange={(e) => setVehicleDetails({...vehicleDetails, customerEmail: e.target.value})}
-                  placeholder="Enter email address"
+                  placeholder={t('enter.email.address')}
                 />
               </div>
               <div>
-                <Label htmlFor="carModel">Car Model</Label>
+                <Label htmlFor="carModel">{t('car.model')}</Label>
                 <Input
                   id="carModel"
                   value={vehicleDetails.carModel}
                   onChange={(e) => setVehicleDetails({...vehicleDetails, carModel: e.target.value})}
-                  placeholder="Enter car model"
+                  placeholder={t('enter.car.model')}
                 />
               </div>
               <div>
-                <Label htmlFor="carYear">Year</Label>
+                <Label htmlFor="carYear">{t('year')}</Label>
                 <Input
                   id="carYear"
                   value={vehicleDetails.carYear}
                   onChange={(e) => setVehicleDetails({...vehicleDetails, carYear: e.target.value})}
-                  placeholder="Enter year"
+                  placeholder={t('enter.year')}
                 />
               </div>
               <div>
-                <Label htmlFor="checkoutDate">Checkout Date</Label>
+                <Label htmlFor="checkoutDate">{t('checkout.date')}</Label>
                 <Input
                   id="checkoutDate"
                   type="date"
@@ -188,21 +194,21 @@ const CheckOut = () => {
                 />
               </div>
               <div>
-                <Label htmlFor="licensePlate">License Plate</Label>
+                <Label htmlFor="licensePlate">{t('license.plate')}</Label>
                 <Input
                   id="licensePlate"
                   value={vehicleDetails.licensePlate}
                   onChange={(e) => setVehicleDetails({...vehicleDetails, licensePlate: e.target.value})}
-                  placeholder="Enter license plate"
+                  placeholder={t('enter.license.plate')}
                 />
               </div>
               <div>
-                <Label htmlFor="mileage">Final Mileage</Label>
+                <Label htmlFor="mileage">{t('final.mileage')}</Label>
                 <Input
                   id="mileage"
                   value={vehicleDetails.mileage}
                   onChange={(e) => setVehicleDetails({...vehicleDetails, mileage: e.target.value})}
-                  placeholder="Enter final mileage"
+                  placeholder={t('enter.final.mileage')}
                 />
               </div>
             </div>
@@ -212,11 +218,11 @@ const CheckOut = () => {
         {/* General Checkout Documentation */}
         <Card>
           <CardHeader>
-            <CardTitle>General Checkout Documentation</CardTitle>
+            <CardTitle>{t('general.checkout.documentation')}</CardTitle>
           </CardHeader>
           <CardContent>
             <MediaUploader
-              title="Upload final inspection photos/videos"
+              title={t('upload.final.inspection')}
               value={generalMedia}
               onChange={setGeneralMedia}
             />
@@ -227,7 +233,7 @@ const CheckOut = () => {
         <Card>
           <CardHeader>
             <CardTitle>
-              Customer Approval Progress: {approvedCount}/{totalItems} items approved
+              {t('customer.approval.progress')}: {approvedCount}/{totalItems} {t('items.approved')}
             </CardTitle>
           </CardHeader>
         </Card>
@@ -235,9 +241,9 @@ const CheckOut = () => {
         {/* Checkout Checklist */}
         <Card>
           <CardHeader>
-            <CardTitle>Customer Approval Checklist</CardTitle>
+            <CardTitle>{t('customer.approval.checklist')}</CardTitle>
             <p className="text-sm text-muted-foreground">
-              Each item must be reviewed with the customer and approved before vehicle pickup.
+              {t('each.item.reviewed')}
             </p>
           </CardHeader>
           <CardContent className="space-y-4">

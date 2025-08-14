@@ -9,44 +9,48 @@ import MediaUploader, { MediaItem } from "@/components/checkin/MediaUploader";
 import ChecklistItemUploader from "@/components/checkin/ChecklistItemUploader";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
+import { useLanguage } from "@/contexts/LanguageContext";
+import LanguageToggle from "@/components/LanguageToggle";
 interface StepData {
   notes?: string;
   media: MediaItem[];
   checklistMedia?: Record<number, MediaItem[]>;
   checklistService?: Record<number, boolean>;
 }
-const stepsConfig = [{
+const getStepsConfig = (t: (key: string) => string) => [{
   key: "vehicle",
-  title: "Vehicle details",
+  title: t('vehicle.details'),
   checklist: []
 }, {
   key: "exterior",
-  title: "Exterior condition",
+  title: t('exterior.condition'),
   checklist: ["Check for scratches, dents, or paint damage", "Inspect bumpers and body panels", "Examine lights (headlights, taillights, indicators)", "Look for rust or corrosion", "Check mirrors and glass condition", "Document any existing damage"]
 }, {
   key: "interior",
-  title: "Interior condition",
+  title: t('interior.condition'),
   checklist: ["Test all seats and adjustments", "Check dashboard and instrument cluster", "Verify air conditioning/heating works", "Test radio, infotainment system", "Inspect upholstery for tears or stains", "Check seatbelts and safety features"]
 }, {
   key: "engine",
-  title: "Engine bay",
+  title: t('engine.bay'),
   checklist: ["Check fluid levels (oil, coolant, brake fluid)", "Inspect belts and hoses for wear", "Look for leaks or corrosion", "Check battery terminals and condition", "Examine air filter condition", "Note any unusual sounds or smells"]
 }, {
   key: "wheels",
-  title: "Wheels & Tires",
+  title: t('wheels.tires'),
   checklist: ["Check tire tread depth and wear patterns", "Inspect for cuts, bulges, or damage", "Verify proper tire pressure", "Examine wheel rims for damage", "Check spare tire condition", "Look for any signs of alignment issues"]
 }, {
   key: "warnings",
-  title: "Dash/Warning lights",
+  title: t('dash.warning.lights'),
   checklist: ["Check engine light status", "Verify all dashboard lights function", "Note any active warning lights", "Test hazard lights and indicators", "Check fuel gauge and other gauges", "Document any error codes or messages"]
 }, {
   key: "final",
-  title: "Final notes",
+  title: t('final.notes'),
   checklist: ["Overall vehicle condition assessment", "Any additional concerns or observations", "Customer-specific requests or notes", "Recommended maintenance or repairs", "Schedule follow-up if needed"]
 }] as const;
-type StepKey = typeof stepsConfig[number]["key"];
+type StepKey = "vehicle" | "exterior" | "interior" | "engine" | "wheels" | "warnings" | "final";
 const CheckIn = () => {
   const navigate = useNavigate();
+  const { t } = useLanguage();
+  const stepsConfig = getStepsConfig(t);
   const [stepIndex, setStepIndex] = useState(0);
 
   // Vehicle fields
@@ -158,7 +162,7 @@ const CheckIn = () => {
       },
       steps: data
     });
-    toast.success("Check-in completed!");
+    toast.success(t('checkin.completed'));
     navigate("/");
   };
   const stepTitle = stepsConfig[stepIndex].title;
@@ -166,8 +170,11 @@ const CheckIn = () => {
       <Seo title="Check-In | Guided Car Checklist" description="Step-by-step car check-in with photos, videos, and notes." canonical="/check-in" />
       <header className="border-b bg-card/50 backdrop-blur supports-[backdrop-filter]:bg-card/60">
         <div className="container mx-auto flex items-center justify-between py-4">
-          <h1 className="text-lg font-semibold">Car Check-In</h1>
-          <div className="text-sm text-muted-foreground">Progress: {progress}%</div>
+          <h1 className="text-lg font-semibold">{t('car.checkin')}</h1>
+          <div className="flex items-center gap-4">
+            <div className="text-sm text-muted-foreground">{t('progress')}: {progress}%</div>
+            <LanguageToggle />
+          </div>
         </div>
       </header>
       <main>
@@ -186,56 +193,56 @@ const CheckIn = () => {
               {currentStep.key === "vehicle" ? <div className="space-y-6">
                   <div className="grid gap-4 sm:grid-cols-2">
                     <div className="space-y-2">
-                      <Label htmlFor="customer">Customer name *</Label>
+                      <Label htmlFor="customer">{t('customer.name')} *</Label>
                       <Input id="customer" value={customerName} onChange={e => setCustomerName(e.target.value)} />
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="phone">Phone number *</Label>
+                      <Label htmlFor="phone">{t('phone.number')} *</Label>
                       <Input id="phone" type="tel" value={customerPhone} onChange={e => setCustomerPhone(e.target.value)} />
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="email">Email address *</Label>
+                      <Label htmlFor="email">{t('email.address')} *</Label>
                       <Input id="email" type="email" value={customerEmail} onChange={e => setCustomerEmail(e.target.value)} />
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="plate">License plate *</Label>
+                      <Label htmlFor="plate">{t('license.plate')} *</Label>
                       <Input id="plate" value={plate} onChange={e => setPlate(e.target.value)} />
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="model">Car model *</Label>
+                      <Label htmlFor="model">{t('car.model')} *</Label>
                       <Input id="model" placeholder="e.g., Honda Civic" value={carModel} onChange={e => setCarModel(e.target.value)} />
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="year">Car year *</Label>
+                      <Label htmlFor="year">{t('car.year')} *</Label>
                       <Input id="year" placeholder="e.g., 2020" value={carYear} onChange={e => setCarYear(e.target.value)} />
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="vin">VIN *</Label>
+                      <Label htmlFor="vin">{t('vin')} *</Label>
                       <Input id="vin" value={vin} onChange={e => setVin(e.target.value)} />
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="mileage">Mileage *</Label>
+                      <Label htmlFor="mileage">{t('mileage')} *</Label>
                       <Input id="mileage" value={mileage} onChange={e => setMileage(e.target.value)} />
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="entryDate">Entry date *</Label>
+                      <Label htmlFor="entryDate">{t('entry.date')} *</Label>
                       <Input id="entryDate" type="date" value={entryDate} onChange={e => setEntryDate(e.target.value)} />
                     </div>
                   </div>
                   
-                  <div className="space-y-4">
+                    <div className="space-y-4">
                     <div className="space-y-2">
-                      <Label>Vehicle Documentation</Label>
+                      <Label>{t('vehicle.documentation')}</Label>
                       <div className="rounded-lg border border-dashed bg-muted/30 p-4">
                         <div className="mb-3 text-sm text-muted-foreground">
-                          <p className="font-medium mb-2">Required media for vehicle intake:</p>
+                          <p className="font-medium mb-2">{t('required.media.intake')}</p>
                           <ul className="list-disc list-inside space-y-1 text-xs">
                             <li><strong>360° video:</strong> Walk around the entire vehicle recording exterior</li>
                             <li><strong>Interior video:</strong> Record dashboard, seats, and all interior areas</li>
                             <li><strong>Documentation photos:</strong> License plate, VIN plate, odometer</li>
                           </ul>
                         </div>
-                        <MediaUploader title="Upload vehicle documentation" value={data.vehicle?.media || []} onChange={items => setData(prev => ({
+                        <MediaUploader title={t('upload.vehicle.documentation')} value={data.vehicle?.media || []} onChange={items => setData(prev => ({
                       ...prev,
                       vehicle: {
                         ...prev.vehicle,
@@ -247,7 +254,7 @@ const CheckIn = () => {
                   </div>
                 </div> : <div className="space-y-6">
                   {currentStep.checklist.length > 0 && <div className="space-y-3">
-                      <Label>Inspection Checklist</Label>
+                      <Label>{t('inspection.checklist')}</Label>
                       <div className="space-y-2">
                         {currentStep.checklist.map((item, index) => <ChecklistItemUploader key={index} item={item} index={index} media={data[currentStep.key]?.checklistMedia?.[index] || []} serviceNeeded={data[currentStep.key]?.checklistService?.[index] || false} onMediaChange={media => setData(prev => ({
                     ...prev,
@@ -270,7 +277,7 @@ const CheckIn = () => {
                   }))} />)}
                       </div>
                     </div>}
-                  <MediaUploader title="Upload photos/videos" value={data[currentStep.key]?.media || []} onChange={items => setData(prev => ({
+                  <MediaUploader title={t('upload.photos.videos')} value={data[currentStep.key]?.media || []} onChange={items => setData(prev => ({
                 ...prev,
                 [currentStep.key]: {
                   ...prev[currentStep.key],
@@ -278,8 +285,8 @@ const CheckIn = () => {
                 }
               }))} />
                   <div className="space-y-2">
-                    <Label htmlFor="notes">Notes</Label>
-                    <Textarea id="notes" placeholder="Add any specifics the technician should know..." value={data[currentStep.key]?.notes || ""} onChange={e => setData(prev => ({
+                    <Label htmlFor="notes">{t('notes')}</Label>
+                    <Textarea id="notes" placeholder={t('add.specifics.technician')} value={data[currentStep.key]?.notes || ""} onChange={e => setData(prev => ({
                   ...prev,
                   [currentStep.key]: {
                     ...prev[currentStep.key],
@@ -297,16 +304,16 @@ const CheckIn = () => {
                   setStepIndex(i => Math.max(0, i - 1));
                 }
               }}>
-                  Back
+                  {t('back')}
                 </Button>
                 {stepIndex < stepsConfig.length - 1 ? <Button onClick={() => canNext && setStepIndex(i => Math.min(stepsConfig.length - 1, i + 1))} disabled={!canNext}>
-                    Next
+                    {t('next')}
                   </Button> : <div className="flex gap-2">
                     <Button variant="outline" onClick={exportCheckInData}>
-                      Export Data
+                      {t('export.data')}
                     </Button>
                     <Button variant="default" onClick={handleFinish}>
-                      Finish check-in
+                      {t('finish.checkin')}
                     </Button>
                   </div>}
               </div>
