@@ -168,7 +168,19 @@ const translations = {
     'service.work.completed': 'Service work completed as requested',
     'tools.equipment.removed': 'All tools and equipment removed',
     'test.drive.completed': 'Test drive completed successfully',
-    'customer.walkthrough.completed': 'Customer walkthrough completed'
+    'customer.walkthrough.completed': 'Customer walkthrough completed',
+    
+    // Parts component translations
+    'service.part': 'Service Part',
+    'serial.number': 'Serial Number',
+    'part.name': 'Part Name',
+    'justification.use': 'Justification for Use',
+    'upload.proof.installation': 'Upload proof of part installation',
+    'enter.serial.number': 'Enter part serial number',
+    'enter.part.name': 'Enter part name/description',
+    'explain.part.used': 'Explain why this part was used, what issue it addresses, etc.',
+    'file': 'file',
+    'files': 'files'
   },
   es: {
     // Index page
@@ -329,7 +341,19 @@ const translations = {
     'service.work.completed': 'Trabajo de servicio completado según solicitado',
     'tools.equipment.removed': 'Todas las herramientas y equipo removidos',
     'test.drive.completed': 'Prueba de manejo completada exitosamente',
-    'customer.walkthrough.completed': 'Recorrido con el cliente completado'
+    'customer.walkthrough.completed': 'Recorrido con el cliente completado',
+    
+    // Parts component translations
+    'service.part': 'Parte de Servicio',
+    'serial.number': 'Número de Serie',
+    'part.name': 'Nombre de la Parte',
+    'justification.use': 'Justificación de Uso',
+    'upload.proof.installation': 'Subir prueba de instalación de la parte',
+    'enter.serial.number': 'Ingrese número de serie de la parte',
+    'enter.part.name': 'Ingrese nombre/descripción de la parte',
+    'explain.part.used': 'Explique por qué se usó esta parte, qué problema resuelve, etc.',
+    'file': 'archivo',
+    'files': 'archivos'
   }
 };
 
