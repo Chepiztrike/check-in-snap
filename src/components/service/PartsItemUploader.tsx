@@ -4,9 +4,10 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Trash2, Wrench } from "lucide-react";
+import { Trash2, Wrench, Camera } from "lucide-react";
 import MediaUploader, { MediaItem } from "@/components/checkin/MediaUploader";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useRef } from "react";
 
 interface PartEntry {
   id: string;
@@ -14,6 +15,7 @@ interface PartEntry {
   partName: string;
   media: MediaItem[];
   justification: string;
+  serialPhoto?: MediaItem[];
 }
 
 interface PartsItemUploaderProps {
@@ -24,7 +26,20 @@ interface PartsItemUploaderProps {
 
 const PartsItemUploader = ({ part, onUpdate, onRemove }: PartsItemUploaderProps) => {
   const { t } = useLanguage();
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const hasMedia = part.media && part.media.length > 0;
+
+  const handleSerialPhotoUpload = (files: FileList) => {
+    const file = files[0];
+    if (file) {
+      const photoItem: MediaItem = {
+        file,
+        type: "image",
+        url: URL.createObjectURL(file),
+      };
+      onUpdate('serialPhoto', [photoItem]);
+    }
+  };
 
   return (
     <Card className="relative">
@@ -51,14 +66,44 @@ const PartsItemUploader = ({ part, onUpdate, onRemove }: PartsItemUploaderProps)
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
+          <div className="space-y-2">
             <Label htmlFor={`serial-${part.id}`}>{t('serial.number')}</Label>
-            <Input
-              id={`serial-${part.id}`}
-              value={part.serialNumber}
-              onChange={(e) => onUpdate('serialNumber', e.target.value)}
-              placeholder={t('enter.serial.number')}
+            <div className="flex gap-2">
+              <Input
+                id={`serial-${part.id}`}
+                value={part.serialNumber}
+                onChange={(e) => onUpdate('serialNumber', e.target.value)}
+                placeholder={t('enter.serial.number')}
+                className="flex-1"
+              />
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => fileInputRef.current?.click()}
+                className="flex-shrink-0"
+                title={t('capture.serial.barcode')}
+              >
+                <Camera className="h-4 w-4" />
+              </Button>
+            </div>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              capture="environment"
+              className="hidden"
+              onChange={(e) => e.currentTarget.files && handleSerialPhotoUpload(e.currentTarget.files)}
             />
+            {part.serialPhoto && part.serialPhoto.length > 0 && (
+              <div className="mt-2">
+                <img
+                  src={part.serialPhoto[0].url}
+                  alt="Serial number"
+                  className="h-20 w-20 object-cover rounded border"
+                />
+              </div>
+            )}
           </div>
           <div>
             <Label htmlFor={`name-${part.id}`}>{t('part.name')}</Label>

@@ -18,6 +18,7 @@ interface PartEntry {
   partName: string;
   media: MediaItem[];
   justification: string;
+  serialPhoto?: MediaItem[];
 }
 
 interface VehicleDetails {
@@ -54,6 +55,7 @@ const PartsService = () => {
       partName: "",
       media: [],
       justification: "",
+      serialPhoto: [],
     };
     setParts([...parts, newPart]);
   };

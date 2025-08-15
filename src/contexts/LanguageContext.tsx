@@ -180,7 +180,9 @@ const translations = {
     'enter.part.name': 'Enter part name/description',
     'explain.part.used': 'Explain why this part was used, what issue it addresses, etc.',
     'file': 'file',
-    'files': 'files'
+    'files': 'files',
+    'upload.serial.photo': 'Upload photo',
+    'capture.serial.barcode': 'Capture serial number or barcode'
   },
   es: {
     // Index page
@@ -353,7 +355,9 @@ const translations = {
     'enter.part.name': 'Ingrese nombre/descripción de la parte',
     'explain.part.used': 'Explique por qué se usó esta parte, qué problema resuelve, etc.',
     'file': 'archivo',
-    'files': 'archivos'
+    'files': 'archivos',
+    'upload.serial.photo': 'Subir foto',
+    'capture.serial.barcode': 'Capturar número de serie o código de barras'
   }
 };
 
