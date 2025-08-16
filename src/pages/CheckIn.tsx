@@ -12,6 +12,7 @@ import { useNavigate } from "react-router-dom";
 import { useLanguage } from "@/contexts/LanguageContext";
 import LanguageToggle from "@/components/LanguageToggle";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
 interface StepData {
   notes?: string;
   media: MediaItem[];
@@ -92,8 +93,28 @@ type StepKey = "vehicle" | "exterior" | "interior" | "engine" | "wheels" | "warn
 const CheckIn = () => {
   const navigate = useNavigate();
   const { t } = useLanguage();
+  const { user, loading } = useAuth();
   const stepsConfig = getStepsConfig(t);
   const [stepIndex, setStepIndex] = useState(0);
+
+  // Redirect to auth if not logged in
+  useEffect(() => {
+    if (!loading && !user) {
+      navigate('/auth');
+    }
+  }, [user, loading, navigate]);
+
+  // Show loading state while checking auth
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
+          <p>Loading...</p>
+        </div>
+      </div>
+    );
+  }
   
   // Client and check-in state
   const [clientNumber, setClientNumber] = useState<string | null>(null);
@@ -260,7 +281,7 @@ const CheckIn = () => {
         .from('checkins')
         .insert({
           client_id: clientId,
-          mechanic_id: null, // No mechanic required for demo
+          mechanic_id: user?.id || null, // Set mechanic ID to current user
           vehicle_vin: vin,
           plate: plate,
           mileage: parseInt(mileage) || 0,
