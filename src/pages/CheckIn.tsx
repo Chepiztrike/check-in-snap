@@ -12,7 +12,6 @@ import { useNavigate } from "react-router-dom";
 import { useLanguage } from "@/contexts/LanguageContext";
 import LanguageToggle from "@/components/LanguageToggle";
 import { supabase } from "@/integrations/supabase/client";
-import { useAuth } from "@/contexts/AuthContext";
 interface StepData {
   notes?: string;
   media: MediaItem[];
@@ -93,28 +92,8 @@ type StepKey = "vehicle" | "exterior" | "interior" | "engine" | "wheels" | "warn
 const CheckIn = () => {
   const navigate = useNavigate();
   const { t } = useLanguage();
-  const { user, loading } = useAuth();
   const stepsConfig = getStepsConfig(t);
   const [stepIndex, setStepIndex] = useState(0);
-
-  // Redirect to auth if not logged in
-  useEffect(() => {
-    if (!loading && !user) {
-      navigate('/auth');
-    }
-  }, [user, loading, navigate]);
-
-  // Show loading state while checking auth
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
-          <p>Loading...</p>
-        </div>
-      </div>
-    );
-  }
   
   // Client and check-in state
   const [clientNumber, setClientNumber] = useState<string | null>(null);
@@ -281,7 +260,7 @@ const CheckIn = () => {
         .from('checkins')
         .insert({
           client_id: clientId,
-          mechanic_id: user?.id || null, // Set mechanic ID to current user
+          mechanic_id: null, // No mechanic required for demo
           vehicle_vin: vin,
           plate: plate,
           mileage: parseInt(mileage) || 0,
@@ -326,26 +305,11 @@ const CheckIn = () => {
             // Add media for this checklist item if any
             if (stepData.checklistMedia && stepData.checklistMedia[i]) {
               for (const media of stepData.checklistMedia[i]) {
-                if (media.file) {
-                  try {
-                    const fileName = `${checkinId}/${step.key}_${i}_${Date.now()}_${media.file.name}`;
-                    const { error: uploadError } = await supabase.storage
-                      .from('checkins')
-                      .upload(fileName, media.file);
-
-                    if (uploadError) {
-                      console.error('Error uploading media:', uploadError);
-                    } else {
-                      mediaFiles.push({
-                        checkin_id: checkinId,
-                        file_path: fileName,
-                        media_type: media.file.type
-                      });
-                    }
-                  } catch (error) {
-                    console.error('Error processing media file:', error);
-                  }
-                }
+                mediaFiles.push({
+                  checkin_id: checkinId,
+                  file_path: media.path,
+                  media_type: media.file.type
+                });
               }
             }
           }
@@ -354,26 +318,11 @@ const CheckIn = () => {
         // Add general media for this step
         if (stepData.media) {
           for (const media of stepData.media) {
-            if (media.file) {
-              try {
-                const fileName = `${checkinId}/${step.key}_general_${Date.now()}_${media.file.name}`;
-                const { error: uploadError } = await supabase.storage
-                  .from('checkins')
-                  .upload(fileName, media.file);
-
-                if (uploadError) {
-                  console.error('Error uploading media:', uploadError);
-                } else {
-                  mediaFiles.push({
-                    checkin_id: checkinId,
-                    file_path: fileName,
-                    media_type: media.file.type
-                  });
-                }
-              } catch (error) {
-                console.error('Error processing media file:', error);
-              }
-            }
+            mediaFiles.push({
+              checkin_id: checkinId,
+              file_path: media.path,
+              media_type: media.file.type
+            });
           }
         }
       }
