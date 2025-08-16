@@ -390,53 +390,104 @@ const ClientPortal = () => {
           </div>
         </div>
 
-        {/* Client Info Card */}
-        <Card className="mb-6">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Car className="h-5 w-5" />
-              {t('client.information')}
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <p className="font-semibold">{t('client.id')}: {client.client_number}</p>
-                <p className="text-muted-foreground">{client.customer_name}</p>
-              </div>
-              <div className="space-y-1">
-                <div className="flex items-center gap-2">
-                  <Phone className="h-4 w-4" />
-                  <span>{client.customer_phone}</span>
+        {/* Client Overview Dashboard */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+          {/* Client Info Card */}
+          <Card className="lg:col-span-2">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Car className="h-5 w-5" />
+                {t('client.information')}
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <p className="font-semibold">{t('client.id')}: {client.client_number}</p>
+                  <p className="text-muted-foreground">{client.customer_name}</p>
                 </div>
-                <div className="flex items-center gap-2">
-                  <Mail className="h-4 w-4" />
-                  <span>{client.customer_email}</span>
-                </div>
-              </div>
-            </div>
-            
-            {checkin && (
-              <div className="mt-4 pt-4 border-t">
-                <h4 className="font-medium mb-2">{t('vehicle.details')}</h4>
-                <div className="grid grid-cols-2 gap-4 text-sm">
-                  <div>
-                    <span className="text-muted-foreground">{t('license.plate')}: </span>
-                    <span className="font-medium">{checkin.plate}</span>
+                <div className="space-y-1">
+                  <div className="flex items-center gap-2">
+                    <Phone className="h-4 w-4" />
+                    <span>{client.customer_phone}</span>
                   </div>
-                  <div>
-                    <span className="text-muted-foreground">{t('mileage')}: </span>
-                    <span className="font-medium">{checkin.mileage}</span>
-                  </div>
-                  <div className="col-span-2">
-                    <span className="text-muted-foreground">{t('vin')}: </span>
-                    <span className="font-medium font-mono text-xs">{checkin.vehicle_vin}</span>
+                  <div className="flex items-center gap-2">
+                    <Mail className="h-4 w-4" />
+                    <span>{client.customer_email}</span>
                   </div>
                 </div>
               </div>
-            )}
-          </CardContent>
-        </Card>
+              
+              {checkin && (
+                <div className="mt-4 pt-4 border-t">
+                  <h4 className="font-medium mb-2">{t('vehicle.details')}</h4>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                    <div>
+                      <span className="text-muted-foreground">{t('car.model')}: </span>
+                      <span className="font-medium">{checkin.car_model || 'N/A'}</span>
+                    </div>
+                    <div>
+                      <span className="text-muted-foreground">{t('year')}: </span>
+                      <span className="font-medium">{checkin.car_year || 'N/A'}</span>
+                    </div>
+                    <div>
+                      <span className="text-muted-foreground">{t('license.plate')}: </span>
+                      <span className="font-medium">{checkin.plate}</span>
+                    </div>
+                    <div>
+                      <span className="text-muted-foreground">{t('mileage')}: </span>
+                      <span className="font-medium">{checkin.mileage}</span>
+                    </div>
+                    <div className="md:col-span-2">
+                      <span className="text-muted-foreground">{t('vin')}: </span>
+                      <span className="font-medium font-mono text-xs">{checkin.vehicle_vin}</span>
+                    </div>
+                    <div className="md:col-span-2">
+                      <span className="text-muted-foreground">{t('checkin.date')}: </span>
+                      <span className="font-medium">{new Date(checkin.created_at).toLocaleDateString()}</span>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Service Summary */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Wrench className="h-5 w-5" />
+                {t('service.summary')}
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="text-center">
+                <div className="text-2xl font-bold text-primary">{checkinItems.length}</div>
+                <div className="text-sm text-muted-foreground">{t('inspection.items')}</div>
+              </div>
+              <div className="text-center">
+                <div className="text-2xl font-bold text-amber-600">
+                  {checkinItems.filter(item => item.service_needed || item.result === 'service_needed').length}
+                </div>
+                <div className="text-sm text-muted-foreground">{t('items.need.service')}</div>
+              </div>
+              <div className="text-center">
+                <div className="text-2xl font-bold text-green-600">
+                  {checkinItems.filter(item => !item.service_needed && item.result !== 'service_needed').length}
+                </div>
+                <div className="text-sm text-muted-foreground">{t('items.passed')}</div>
+              </div>
+              {serviceApprovals.length > 0 && (
+                <div className="text-center pt-2 border-t">
+                  <div className="text-lg font-semibold">
+                    ${serviceApprovals.reduce((sum, approval) => sum + (approval.estimated_cost || 0), 0).toFixed(2)}
+                  </div>
+                  <div className="text-sm text-muted-foreground">{t('estimated.cost')}</div>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </div>
 
         {/* Progress Overview */}
         <Card className="mb-6">
@@ -604,6 +655,132 @@ const ClientPortal = () => {
               <p className="text-xs text-blue-600">
                 {t('mechanic.workflow.note')}
               </p>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Parts & Service Information */}
+        {partsServiceSession && (
+          <Card className="mb-6">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Wrench className="h-5 w-5" />
+                {t('parts.service.information')}
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <h4 className="font-medium mb-2">{t('service.date')}</h4>
+                    <p className="text-sm text-muted-foreground">
+                      {new Date(partsServiceSession.created_at).toLocaleDateString()}
+                    </p>
+                  </div>
+                  <div>
+                    <h4 className="font-medium mb-2">{t('status')}</h4>
+                    <Badge variant={partsServiceSession.status === 'completed' ? 'default' : 'secondary'}>
+                      {partsServiceSession.status}
+                    </Badge>
+                  </div>
+                </div>
+                
+                {Array.isArray(partsServiceSession.parts_data) && partsServiceSession.parts_data.length > 0 && (
+                  <div>
+                    <h4 className="font-medium mb-2">{t('parts.used')}</h4>
+                    <div className="space-y-2">
+                      {partsServiceSession.parts_data.map((part: any, index: number) => (
+                        <div key={index} className="border rounded p-3 bg-muted/50">
+                          <div className="flex justify-between items-start">
+                            <div>
+                              <p className="font-medium">{part.partName}</p>
+                              <p className="text-sm text-muted-foreground">S/N: {part.serialNumber}</p>
+                            </div>
+                          </div>
+                          {part.justification && (
+                            <p className="text-sm mt-2">{part.justification}</p>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Checkout Information */}
+        {checkoutSession && (
+          <Card className="mb-6">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <CheckCircle className="h-5 w-5" />
+                {t('checkout.information')}
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <h4 className="font-medium mb-2">{t('checkout.date')}</h4>
+                    <p className="text-sm text-muted-foreground">
+                      {new Date(checkoutSession.created_at).toLocaleDateString()}
+                    </p>
+                  </div>
+                  <div>
+                    <h4 className="font-medium mb-2">{t('status')}</h4>
+                    <Badge variant={checkoutSession.status === 'completed' ? 'default' : 'secondary'}>
+                      {checkoutSession.status}
+                    </Badge>
+                  </div>
+                </div>
+                
+                {checkoutSession.checkout_items && Object.keys(checkoutSession.checkout_items).length > 0 && (
+                  <div>
+                    <h4 className="font-medium mb-2">{t('checkout.items.completed')}</h4>
+                    <div className="text-sm text-muted-foreground">
+                      {Object.values(checkoutSession.checkout_items).filter((item: any) => item.approved).length} / {Object.keys(checkoutSession.checkout_items).length} {t('items.approved')}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Media Gallery */}
+        {checkinMedia.length > 0 && (
+          <Card className="mb-6">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Image className="h-5 w-5" />
+                {t('inspection.media')} ({checkinMedia.length})
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                {checkinMedia.slice(0, 8).map((media) => (
+                  <div key={media.id} className="border rounded-lg overflow-hidden">
+                    {media.media_type.startsWith('image/') ? (
+                      <img 
+                        src={`${SUPABASE_URL}/storage/v1/object/public/checkins/${media.file_path}`}
+                        alt="Inspection media"
+                        className="w-full h-24 object-cover"
+                      />
+                    ) : (
+                      <div className="w-full h-24 bg-muted flex items-center justify-center">
+                        {getMediaIcon(media.media_type)}
+                      </div>
+                    )}
+                  </div>
+                ))}
+                {checkinMedia.length > 8 && (
+                  <div className="border rounded-lg border-dashed bg-muted/50 h-24 flex items-center justify-center text-sm text-muted-foreground">
+                    +{checkinMedia.length - 8} more
+                  </div>
+                )}
+              </div>
             </CardContent>
           </Card>
         )}
