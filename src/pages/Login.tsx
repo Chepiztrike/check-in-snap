@@ -99,12 +99,12 @@ const Login = () => {
                    <Button
                      key={index}
                      variant="outline"
-                     className="w-full justify-start h-auto p-4 min-h-[100px] overflow-hidden hover:bg-primary hover:text-primary-foreground transition-colors"
+                     className="w-full justify-start h-auto p-4 min-h-[100px] overflow-hidden"
                      onClick={() => navigate(option.href)}
                    >
                      <div className="text-left w-full pr-2">
                        <div className="font-medium text-base mb-2 line-clamp-1">{option.title}</div>
-                       <div className="text-xs font-medium leading-tight line-clamp-3 [.hover\:bg-primary_&]:text-primary-foreground">
+                       <div className="text-sm text-muted-foreground leading-tight line-clamp-2">
                          {option.description}
                        </div>
                      </div>
