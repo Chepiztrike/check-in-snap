@@ -31,6 +31,8 @@ interface Checkin {
   mileage: number;
   vehicle_vin: string;
   plate: string;
+  car_model?: string;
+  car_year?: string;
   created_at: string;
 }
 
@@ -575,7 +577,7 @@ const ClientPortal = () => {
               {/* Vehicle Information Summary */}
               <div className="bg-muted/50 rounded-lg p-4">
                 <h4 className="font-semibold mb-3 text-foreground">{t('vehicle.information')}</h4>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                   <div className="space-y-1">
                     <p className="text-sm font-medium text-muted-foreground">{t('license.plate')}</p>
                     <p className="font-medium">{checkin.plate || t('not.provided')}</p>
@@ -585,10 +587,20 @@ const ClientPortal = () => {
                     <p className="font-medium">{checkin.mileage ? `${checkin.mileage} km` : t('not.provided')}</p>
                   </div>
                   <div className="space-y-1">
-                    <p className="text-sm font-medium text-muted-foreground">{t('vehicle.vin')}</p>
-                    <p className="font-medium">{checkin.vehicle_vin || t('not.provided')}</p>
+                    <p className="text-sm font-medium text-muted-foreground">{t('car.model')}</p>
+                    <p className="font-medium">{checkin.car_model || t('not.provided')}</p>
+                  </div>
+                  <div className="space-y-1">
+                    <p className="text-sm font-medium text-muted-foreground">{t('year')}</p>
+                    <p className="font-medium">{checkin.car_year || t('not.provided')}</p>
                   </div>
                 </div>
+                {checkin.vehicle_vin && (
+                  <div className="mt-3 pt-3 border-t">
+                    <p className="text-sm font-medium text-muted-foreground mb-1">{t('vehicle.vin')}</p>
+                    <p className="text-sm bg-background/60 p-2 rounded font-mono">{checkin.vehicle_vin}</p>
+                  </div>
+                )}
                 {checkin.client_notes && (
                   <div className="mt-3 pt-3 border-t">
                     <p className="text-sm font-medium text-muted-foreground mb-1">{t('client.notes')}</p>
@@ -693,9 +705,12 @@ const ClientPortal = () => {
 
         {/* Service Approvals */}
         {serviceApprovals.length > 0 && (
-          <Card className="mb-6">
+          <Card className="mb-6 border-orange-200">
             <CardHeader>
-              <CardTitle>{t('service.approvals.required')}</CardTitle>
+              <CardTitle className="flex items-center gap-2">
+                <Wrench className="h-5 w-5 text-orange-500" />
+                {t('service.approvals.required')}
+              </CardTitle>
               <CardDescription>
                 {t('review.approve.each.service')}
               </CardDescription>
@@ -703,38 +718,52 @@ const ClientPortal = () => {
             <CardContent>
               <div className="space-y-4">
                 {serviceApprovals.map((approval) => (
-                  <div key={approval.id} className="border rounded-lg p-4">
-                    <div className="flex justify-between items-start mb-2">
-                      <h4 className="font-medium">{approval.service_description}</h4>
-                      <Badge variant={approval.approved ? "default" : "secondary"}>
+                  <div key={approval.id} className="border rounded-lg p-4 bg-orange-50/50">
+                    <div className="flex justify-between items-start mb-3">
+                      <div className="flex-1">
+                        <h4 className="font-medium text-lg">{approval.service_description}</h4>
+                        {approval.estimated_cost > 0 && (
+                          <p className="text-sm text-muted-foreground mt-1">
+                            {t('estimated.cost')}: <span className="font-semibold">${approval.estimated_cost}</span>
+                          </p>
+                        )}
+                      </div>
+                      <Badge variant={approval.approved ? "default" : "secondary"} className={approval.approved ? "bg-green-600" : ""}>
                         {approval.approved ? t('approved') : t('pending.approval')}
                       </Badge>
                     </div>
-                    {approval.estimated_cost > 0 && (
-                      <p className="text-sm text-muted-foreground mb-2">
-                        {t('estimated.cost')}: ${approval.estimated_cost}
-                      </p>
-                    )}
+                    
+                    {/* Service Details */}
+                    <div className="bg-background/60 rounded p-3 mb-3">
+                      <p className="text-sm font-medium mb-1">{t('service.description')}:</p>
+                      <p className="text-sm">{approval.service_description}</p>
+                    </div>
+                    
                     {!approval.approved && (
-                      <div className="space-y-2">
+                      <div className="space-y-3 pt-3 border-t">
                         <Textarea 
                           placeholder={t('add.notes.optional')}
                           id={`notes-${approval.id}`}
+                          className="min-h-[80px]"
                         />
-                        <Button 
-                          onClick={() => {
-                            const notes = (document.getElementById(`notes-${approval.id}`) as HTMLTextAreaElement)?.value || '';
-                            handleApproveService(approval.id, notes);
-                          }}
-                          size="sm"
-                        >
-                          {t('approve.service')}
-                        </Button>
+                        <div className="flex justify-end">
+                          <Button 
+                            onClick={() => {
+                              const notes = (document.getElementById(`notes-${approval.id}`) as HTMLTextAreaElement)?.value || '';
+                              handleApproveService(approval.id, notes);
+                            }}
+                            className="bg-green-600 hover:bg-green-700"
+                          >
+                            {t('approve.service')}
+                          </Button>
+                        </div>
                       </div>
                     )}
+                    
                     {approval.approved && approval.client_notes && (
-                      <div className="mt-2 p-2 bg-muted rounded">
-                        <p className="text-sm">{t('your.notes')}: {approval.client_notes}</p>
+                      <div className="mt-3 p-3 bg-green-50 border border-green-200 rounded">
+                        <p className="text-sm font-medium text-green-700 mb-1">{t('your.notes')}:</p>
+                        <p className="text-sm text-green-600">{approval.client_notes}</p>
                       </div>
                     )}
                   </div>
@@ -763,7 +792,7 @@ const ClientPortal = () => {
               {/* Checkout Summary */}
               <div className="bg-blue-50/50 rounded-lg p-4">
                 <h4 className="font-semibold mb-3 text-blue-700">{t('final.inspection.summary')}</h4>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                   <div className="space-y-1">
                     <p className="text-sm font-medium text-muted-foreground">{t('license.plate')}</p>
                     <p className="font-medium">{checkin.plate || t('not.provided')}</p>
@@ -773,8 +802,12 @@ const ClientPortal = () => {
                     <p className="font-medium">{checkin.mileage ? `${checkin.mileage} km` : t('not.provided')}</p>
                   </div>
                   <div className="space-y-1">
-                    <p className="text-sm font-medium text-muted-foreground">{t('checkout.date')}</p>
-                    <p className="font-medium">{new Date().toLocaleDateString()}</p>
+                    <p className="text-sm font-medium text-muted-foreground">{t('car.model')}</p>
+                    <p className="font-medium">{checkin.car_model || t('not.provided')}</p>
+                  </div>
+                  <div className="space-y-1">
+                    <p className="text-sm font-medium text-muted-foreground">{t('year')}</p>
+                    <p className="font-medium">{checkin.car_year || t('not.provided')}</p>
                   </div>
                 </div>
               </div>

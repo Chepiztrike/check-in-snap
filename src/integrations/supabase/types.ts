@@ -89,6 +89,8 @@ export type Database = {
       }
       checkins: {
         Row: {
+          car_model: string | null
+          car_year: string | null
           checkin_approved: boolean | null
           checkout_approved: boolean | null
           client_id: string | null
@@ -103,6 +105,8 @@ export type Database = {
           vehicle_vin: string | null
         }
         Insert: {
+          car_model?: string | null
+          car_year?: string | null
           checkin_approved?: boolean | null
           checkout_approved?: boolean | null
           client_id?: string | null
@@ -117,6 +121,8 @@ export type Database = {
           vehicle_vin?: string | null
         }
         Update: {
+          car_model?: string | null
+          car_year?: string | null
           checkin_approved?: boolean | null
           checkout_approved?: boolean | null
           client_id?: string | null

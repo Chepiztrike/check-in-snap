@@ -266,6 +266,8 @@ const translations = {
     'completed': 'Completed',
     'final.quality.checks': 'Final Quality Checks',
     'confirm.vehicle.ready.pickup': 'Please confirm that your vehicle is ready for pickup',
+    'service.description': 'Service Description',
+    'client.notes.key': 'Your Notes',
     
     // Client portal enhancements
     'inspection.results': 'Inspection Results',
@@ -539,6 +541,8 @@ const translations = {
     'completed': 'Completado',
     'final.quality.checks': 'Verificaciones de Calidad Final',
     'confirm.vehicle.ready.pickup': 'Por favor confirma que tu vehículo está listo para recoger',
+    'service.description': 'Descripción del Servicio',
+    'client.notes.key': 'Tus Notas',
     
     // Client portal enhancements
     'inspection.results': 'Resultados de Inspección',
