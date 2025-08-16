@@ -245,7 +245,17 @@ const translations = {
     'inspection.results': 'Inspection Results',
     'detailed.inspection.findings': 'Detailed findings from your vehicle inspection',
     'service.required': 'Service Required',
-    'uploaded.media': 'Uploaded Media'
+    'uploaded.media': 'Uploaded Media',
+    'inspection.passed': 'Passed',
+    'inspection.notes': 'Inspector Notes',
+    'action.required': 'Action Required',
+    'service.recommendation.for': 'Professional service recommended for',
+    'inspection.evidence': 'Inspection Evidence',
+    
+    // Mechanic workflow
+    'mechanic.workflow': 'Mechanic Workflow',
+    'mechanic.next.steps': 'Tools for the mechanic to proceed with service',
+    'mechanic.workflow.note': 'These links open the mechanic workflow in new tabs'
   },
   es: {
     // Index page
@@ -483,7 +493,17 @@ const translations = {
     'inspection.results': 'Resultados de Inspección',
     'detailed.inspection.findings': 'Hallazgos detallados de la inspección de tu vehículo',
     'service.required': 'Servicio Requerido',
-    'uploaded.media': 'Medios Subidos'
+    'uploaded.media': 'Medios Subidos',
+    'inspection.passed': 'Aprobado',
+    'inspection.notes': 'Notas del Inspector',
+    'action.required': 'Acción Requerida',
+    'service.recommendation.for': 'Se recomienda servicio profesional para',
+    'inspection.evidence': 'Evidencia de Inspección',
+    
+    // Mechanic workflow
+    'mechanic.workflow': 'Flujo de Trabajo del Mecánico',
+    'mechanic.next.steps': 'Herramientas para que el mecánico proceda con el servicio',
+    'mechanic.workflow.note': 'Estos enlaces abren el flujo de trabajo del mecánico en nuevas pestañas'
   }
 };
 

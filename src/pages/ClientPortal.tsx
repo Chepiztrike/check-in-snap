@@ -39,6 +39,7 @@ interface CheckinItem {
   item_key: string;
   notes: string;
   result: string;
+  service_needed: boolean;
   checkin_id: string;
 }
 
@@ -381,7 +382,7 @@ const ClientPortal = () => {
           </CardContent>
         </Card>
 
-        {/* Inspection Checklist Results */}
+        {/* Inspection Results with Service Requirements */}
         {checkinItems.length > 0 && (
           <Card className="mb-6">
             <CardHeader>
@@ -397,17 +398,30 @@ const ClientPortal = () => {
               <div className="space-y-4">
                 {checkinItems.map((item) => {
                   const itemMedia = checkinMedia.filter(m => m.checkin_id === item.checkin_id);
-                  const hasServiceIssue = item.result === 'service_needed';
+                  const needsService = item.result === 'service_needed' || item.service_needed;
+                  const isPassed = !needsService;
                   
                   return (
-                    <div key={item.id} className="border rounded-lg p-4">
+                    <div key={item.id} className={`border rounded-lg p-4 ${needsService ? 'border-amber-200 bg-amber-50' : 'border-green-200 bg-green-50'}`}>
                       <div className="flex justify-between items-start mb-2">
-                        <h4 className="font-medium">{getItemName(item.item_key)}</h4>
                         <div className="flex items-center gap-2">
-                          {hasServiceIssue && (
+                          {isPassed ? (
+                            <CheckCircle className="h-5 w-5 text-green-600" />
+                          ) : (
+                            <AlertCircle className="h-5 w-5 text-amber-600" />
+                          )}
+                          <h4 className="font-medium">{getItemName(item.item_key)}</h4>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          {needsService ? (
                             <Badge variant="destructive" className="flex items-center gap-1">
                               <Wrench className="h-3 w-3" />
                               {t('service.required')}
+                            </Badge>
+                          ) : (
+                            <Badge variant="default" className="flex items-center gap-1 bg-green-600">
+                              <CheckCircle className="h-3 w-3" />
+                              {t('inspection.passed')}
                             </Badge>
                           )}
                           {itemMedia.length > 0 && (
@@ -420,14 +434,26 @@ const ClientPortal = () => {
                       </div>
                       
                       {item.notes && (
-                        <p className="text-sm text-muted-foreground mb-2">
-                          {t('notes')}: {item.notes}
-                        </p>
+                        <div className={`p-3 rounded mb-3 ${needsService ? 'bg-amber-100' : 'bg-green-100'}`}>
+                          <p className="text-sm font-medium mb-1">{t('inspection.notes')}:</p>
+                          <p className="text-sm">{item.notes}</p>
+                        </div>
+                      )}
+                      
+                      {needsService && (
+                        <div className="mb-3 p-3 bg-amber-100 rounded border border-amber-200">
+                          <p className="text-sm font-medium text-amber-800 mb-1">
+                            {t('action.required')}:
+                          </p>
+                          <p className="text-sm text-amber-700">
+                            {t('service.recommendation.for')} {getItemName(item.item_key).toLowerCase()}
+                          </p>
+                        </div>
                       )}
                       
                       {itemMedia.length > 0 && (
                         <div className="mt-3">
-                          <p className="text-sm font-medium mb-2">{t('uploaded.media')}:</p>
+                          <p className="text-sm font-medium mb-2">{t('inspection.evidence')}:</p>
                           <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
                             {itemMedia.map((media) => (
                               <div key={media.id} className="relative group">
@@ -453,6 +479,44 @@ const ClientPortal = () => {
                   );
                 })}
               </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Mechanic Actions - Only shown after checkin is approved */}
+        {checkin?.checkin_approved && !checkin?.checkout_approved && (
+          <Card className="mb-6 border-blue-200 bg-blue-50">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-blue-700">
+                <Wrench className="h-5 w-5" />
+                {t('mechanic.workflow')}
+              </CardTitle>
+              <CardDescription className="text-blue-600">
+                {t('mechanic.next.steps')}
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <Button 
+                  variant="outline"
+                  onClick={() => window.open(`/parts-service?clientId=${client?.client_number}`, '_blank')}
+                  className="flex items-center gap-2 border-blue-200 text-blue-700 hover:bg-blue-100"
+                >
+                  <Wrench className="h-4 w-4" />
+                  {t('parts.service')}
+                </Button>
+                <Button 
+                  variant="outline"
+                  onClick={() => window.open(`/check-out?clientId=${client?.client_number}`, '_blank')}
+                  className="flex items-center gap-2 border-blue-200 text-blue-700 hover:bg-blue-100"
+                >
+                  <Car className="h-4 w-4" />
+                  {t('vehicle.checkout')}
+                </Button>
+              </div>
+              <p className="text-xs text-blue-600">
+                {t('mechanic.workflow.note')}
+              </p>
             </CardContent>
           </Card>
         )}

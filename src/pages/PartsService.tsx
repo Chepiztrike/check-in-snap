@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -33,6 +34,8 @@ interface VehicleDetails {
 }
 
 const PartsService = () => {
+  const [searchParams] = useSearchParams();
+  const clientId = searchParams.get('clientId');
   const { t } = useLanguage();
   const [vehicleDetails, setVehicleDetails] = useState<VehicleDetails>({
     customerName: "",
