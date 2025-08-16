@@ -77,14 +77,28 @@ const ClientPortal = () => {
 
   const loadClientData = async () => {
     try {
+      console.log('Loading client data for:', clientId);
+      
       // Load client info
       const { data: clientData, error: clientError } = await supabase
         .from('clients')
         .select('*')
         .eq('client_number', clientId)
-        .single();
+        .maybeSingle();
 
-      if (clientError) throw clientError;
+      if (clientError) {
+        console.error('Client error:', clientError);
+        throw clientError;
+      }
+      
+      if (!clientData) {
+        console.log('No client found for ID:', clientId);
+        setClient(null);
+        setLoading(false);
+        return;
+      }
+      
+      console.log('Client data loaded:', clientData);
       setClient(clientData);
 
       // Load checkin data
@@ -92,9 +106,15 @@ const ClientPortal = () => {
         .from('checkins')
         .select('*')
         .eq('client_id', clientData.id)
-        .single();
+        .maybeSingle();
+
+      if (checkinError) {
+        console.error('Checkin error:', checkinError);
+        // Don't throw, just log - client might not have checkin yet
+      }
 
       if (checkinData) {
+        console.log('Checkin data loaded:', checkinData);
         setCheckin(checkinData);
 
         // Load checkin items
@@ -103,7 +123,12 @@ const ClientPortal = () => {
           .select('*')
           .eq('checkin_id', checkinData.id);
 
-        if (itemsData) setCheckinItems(itemsData);
+        if (itemsError) {
+          console.error('Items error:', itemsError);
+        } else if (itemsData) {
+          console.log('Checkin items loaded:', itemsData);
+          setCheckinItems(itemsData);
+        }
 
         // Load checkin media
         const { data: mediaData, error: mediaError } = await supabase
@@ -111,7 +136,12 @@ const ClientPortal = () => {
           .select('*')
           .eq('checkin_id', checkinData.id);
 
-        if (mediaData) setCheckinMedia(mediaData);
+        if (mediaError) {
+          console.error('Media error:', mediaError);
+        } else if (mediaData) {
+          console.log('Media data loaded:', mediaData);
+          setCheckinMedia(mediaData);
+        }
 
         // Load service approvals
         const { data: approvalsData, error: approvalsError } = await supabase
@@ -119,7 +149,14 @@ const ClientPortal = () => {
           .select('*')
           .eq('checkin_id', checkinData.id);
 
-        if (approvalsData) setServiceApprovals(approvalsData);
+        if (approvalsError) {
+          console.error('Approvals error:', approvalsError);
+        } else if (approvalsData) {
+          console.log('Service approvals loaded:', approvalsData);
+          setServiceApprovals(approvalsData);
+        }
+      } else {
+        console.log('No checkin data found for client');
       }
     } catch (error) {
       console.error('Error loading client data:', error);
