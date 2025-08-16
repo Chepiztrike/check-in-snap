@@ -1,10 +1,11 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "@/hooks/use-toast";
 import { Download, Plus, ArrowLeft } from "lucide-react";
 import Seo from "@/components/Seo";
@@ -37,6 +38,29 @@ const PartsService = () => {
   const [searchParams] = useSearchParams();
   const clientId = searchParams.get('clientId');
   const { t } = useLanguage();
+  
+  // Require client ID to proceed
+  if (!clientId) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <Card className="w-full max-w-md">
+          <CardHeader>
+            <CardTitle className="text-center text-destructive">
+              {t('client.id.required')}
+            </CardTitle>
+            <CardDescription className="text-center">
+              {t('client.id.required.description')}
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Button onClick={() => window.history.back()} className="w-full">
+              {t('back')}
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
   const [vehicleDetails, setVehicleDetails] = useState<VehicleDetails>({
     customerName: "",
     customerPhone: "",
@@ -47,6 +71,66 @@ const PartsService = () => {
     licensePlate: "",
     mileage: "",
   });
+  
+  // Load client data when clientId is available
+  useEffect(() => {
+    if (clientId) {
+      loadClientData();
+    }
+  }, [clientId]);
+  
+  const loadClientData = async () => {
+    try {
+      // Load client info
+      const { data: clientData, error: clientError } = await supabase
+        .from('clients')
+        .select('*')
+        .eq('client_number', clientId)
+        .maybeSingle();
+
+      if (clientError) throw clientError;
+      
+      if (clientData) {
+        // Load existing check-in data
+        const { data: checkinData } = await supabase
+          .from('checkins')
+          .select('*')
+          .eq('client_id', clientData.id)
+          .maybeSingle();
+        
+        // Pre-populate vehicle details from client and check-in data
+        setVehicleDetails({
+          customerName: clientData.customer_name || "",
+          customerPhone: clientData.customer_phone || "",
+          customerEmail: clientData.customer_email || "",
+          carModel: checkinData?.car_model || "",
+          carYear: checkinData?.car_year || "",
+          entryDate: new Date().toISOString().split('T')[0],
+          licensePlate: checkinData?.plate || "",
+          mileage: checkinData?.mileage?.toString() || "",
+        });
+        
+        // Load existing parts service session if exists
+        const { data: sessionData } = await supabase
+          .from('parts_service_sessions')
+          .select('*')
+          .eq('client_id', clientData.id)
+          .maybeSingle();
+          
+        if (sessionData) {
+          setGeneralMedia((sessionData.general_media as unknown as MediaItem[]) || []);
+          setParts((sessionData.parts_data as unknown as PartEntry[]) || []);
+        }
+      }
+    } catch (error) {
+      console.error('Error loading client data:', error);
+      toast({
+        title: 'Error loading client data',
+        description: 'Could not load existing client information.',
+        variant: 'destructive'
+      });
+    }
+  };
 
   const [generalMedia, setGeneralMedia] = useState<MediaItem[]>([]);
   const [parts, setParts] = useState<PartEntry[]>([]);
@@ -73,8 +157,51 @@ const PartsService = () => {
     setParts(parts.filter(part => part.id !== id));
   };
 
+  const handleSave = async () => {
+    try {
+      if (!clientId) return;
+      
+      // Find client by client number
+      const { data: clientData, error: clientError } = await supabase
+        .from('clients')
+        .select('id')
+        .eq('client_number', clientId)
+        .single();
+
+      if (clientError) throw clientError;
+
+      // Save or update parts service session
+      const { error: sessionError } = await supabase
+        .from('parts_service_sessions')
+        .upsert({
+          client_id: clientData.id,
+          vehicle_details: vehicleDetails as any,
+          general_media: generalMedia as any,
+          parts_data: parts as any,
+          status: 'completed'
+        }, {
+          onConflict: 'client_id'
+        });
+
+      if (sessionError) throw sessionError;
+
+      toast({
+        title: t('data.saved.successfully'),
+        description: t('parts.service.saved'),
+      });
+    } catch (error) {
+      console.error('Error saving parts service data:', error);
+      toast({
+        title: 'Error saving data',
+        description: 'Could not save parts service information.',
+        variant: 'destructive'
+      });
+    }
+  };
+
   const handleExport = () => {
     const exportData = {
+      clientId,
       vehicleDetails,
       generalMedia: generalMedia.map(item => ({ url: item.url, type: item.type })),
       parts: parts.map(part => ({
@@ -89,7 +216,7 @@ const PartsService = () => {
     const dataStr = JSON.stringify(exportData, null, 2);
     const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
     
-    const exportFileDefaultName = `parts-service-${vehicleDetails.licensePlate || 'unknown'}-${new Date().toISOString().split('T')[0]}.json`;
+    const exportFileDefaultName = `parts-service-${clientId}-${new Date().toISOString().split('T')[0]}.json`;
     
     const linkElement = document.createElement('a');
     linkElement.setAttribute('href', dataUri);
@@ -121,7 +248,14 @@ const PartsService = () => {
           <h1 className="text-2xl font-semibold">{t('parts.service.documentation')}</h1>
         </div>
         <div className="flex items-center gap-4">
-          <Button onClick={handleExport} className="gap-2">
+          <div className="text-sm bg-primary/10 text-primary px-3 py-1 rounded-full border border-primary/20">
+            {t('client.id')}: <span className="font-mono font-semibold">{clientId}</span>
+          </div>
+          <Button onClick={handleSave} variant="default" className="gap-2">
+            <Download className="h-4 w-4" />
+            {t('save.data')}
+          </Button>
+          <Button onClick={handleExport} variant="outline" className="gap-2">
             <Download className="h-4 w-4" />
             {t('export.data')}
           </Button>

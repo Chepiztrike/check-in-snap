@@ -255,7 +255,7 @@ const CheckIn = () => {
 
       if (clientUpdateError) throw clientUpdateError;
 
-      // Create the check-in record
+      // Create the check-in record with car model and year
       const { error: checkinError } = await supabase
         .from('checkins')
         .insert({
@@ -264,6 +264,8 @@ const CheckIn = () => {
           vehicle_vin: vin,
           plate: plate,
           mileage: parseInt(mileage) || 0,
+          car_model: carModel,
+          car_year: carYear,
           status: 'submitted'
         });
 

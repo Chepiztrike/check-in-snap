@@ -60,6 +60,24 @@ interface ServiceApproval {
   client_notes: string;
 }
 
+interface PartsServiceSession {
+  id: string;
+  vehicle_details: any;
+  general_media: any;
+  parts_data: any;
+  status: string;
+  created_at: string;
+}
+
+interface CheckoutSession {
+  id: string;
+  vehicle_details: any;
+  general_media: any;
+  checkout_items: any;
+  status: string;
+  created_at: string;
+}
+
 const ClientPortal = () => {
   const { clientId } = useParams();
   const navigate = useNavigate();
@@ -69,6 +87,8 @@ const ClientPortal = () => {
   const [checkinItems, setCheckinItems] = useState<CheckinItem[]>([]);
   const [checkinMedia, setCheckinMedia] = useState<CheckinMedia[]>([]);
   const [serviceApprovals, setServiceApprovals] = useState<ServiceApproval[]>([]);
+  const [partsServiceSession, setPartsServiceSession] = useState<PartsServiceSession | null>(null);
+  const [checkoutSession, setCheckoutSession] = useState<CheckoutSession | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -156,6 +176,34 @@ const ClientPortal = () => {
         } else if (approvalsData) {
           console.log('Service approvals loaded:', approvalsData);
           setServiceApprovals(approvalsData);
+        }
+
+        // Load parts & service session
+        const { data: partsData, error: partsError } = await supabase
+          .from('parts_service_sessions')
+          .select('*')
+          .eq('client_id', clientData.id)
+          .maybeSingle();
+
+        if (partsError) {
+          console.error('Parts service error:', partsError);
+        } else if (partsData) {
+          console.log('Parts service session loaded:', partsData);
+          setPartsServiceSession(partsData as PartsServiceSession);
+        }
+
+        // Load checkout session
+        const { data: checkoutData, error: checkoutError } = await supabase
+          .from('checkout_sessions')
+          .select('*')
+          .eq('client_id', clientData.id)
+          .maybeSingle();
+
+        if (checkoutError) {
+          console.error('Checkout session error:', checkoutError);
+        } else if (checkoutData) {
+          console.log('Checkout session loaded:', checkoutData);
+          setCheckoutSession(checkoutData as CheckoutSession);
         }
       } else {
         console.log('No checkin data found for client');

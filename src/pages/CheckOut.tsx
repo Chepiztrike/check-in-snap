@@ -1,9 +1,10 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "@/hooks/use-toast";
 import { Download, ArrowLeft } from "lucide-react";
 import Seo from "@/components/Seo";
@@ -47,6 +48,29 @@ const CheckOut = () => {
   const [searchParams] = useSearchParams();
   const clientId = searchParams.get('clientId');
   const { t } = useLanguage();
+  
+  // Require client ID to proceed
+  if (!clientId) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <Card className="w-full max-w-md">
+          <CardHeader>
+            <CardTitle className="text-center text-destructive">
+              {t('client.id.required')}
+            </CardTitle>
+            <CardDescription className="text-center">
+              {t('client.id.required.description')}
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Button onClick={() => window.history.back()} className="w-full">
+              {t('back')}
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
   const checkoutItems = getCheckoutItems(t);
   const [vehicleDetails, setVehicleDetails] = useState<VehicleDetails>({
     customerName: "",
@@ -61,6 +85,65 @@ const CheckOut = () => {
 
   const [generalMedia, setGeneralMedia] = useState<MediaItem[]>([]);
   const [checkoutData, setCheckoutData] = useState<Record<number, CheckoutItemData>>({});
+  
+  // Load client data when clientId is available
+  useEffect(() => {
+    if (clientId) {
+      loadClientData();
+    }
+  }, [clientId]);
+  
+  const loadClientData = async () => {
+    try {
+      // Load client info
+      const { data: clientData, error: clientError } = await supabase
+        .from('clients')
+        .select('*')
+        .eq('client_number', clientId)
+        .maybeSingle();
+
+      if (clientError) throw clientError;
+      
+      if (clientData) {
+        // Load existing check-in data
+        const { data: checkinData } = await supabase
+          .from('checkins')
+          .select('*')
+          .eq('client_id', clientData.id)
+          .maybeSingle();
+        
+        // Pre-populate vehicle details from client and check-in data
+        setVehicleDetails({
+          customerName: clientData.customer_name || "",
+          customerPhone: clientData.customer_phone || "",
+          customerEmail: clientData.customer_email || "",
+          carModel: checkinData?.car_model || "",
+          carYear: checkinData?.car_year || "",
+          checkoutDate: new Date().toISOString().split('T')[0],
+          licensePlate: checkinData?.plate || "",
+          mileage: checkinData?.mileage?.toString() || "",
+        });
+        
+        // Load existing checkout session if exists
+        const { data: sessionData } = await supabase
+          .from('checkout_sessions')
+          .select('*')
+          .eq('client_id', clientData.id)
+          .maybeSingle();
+          
+        if (sessionData) {
+          setGeneralMedia((sessionData.general_media as unknown as MediaItem[]) || []);
+          setCheckoutData((sessionData.checkout_items as unknown as Record<number, CheckoutItemData>) || {});
+        }
+      }
+    } catch (error) {
+      console.error('Error loading client data:', error);
+      toast({
+        title: 'Error loading client data',
+        description: 'Could not load existing client information.',
+      });
+    }
+  };
 
   const handleCheckoutDataChange = (index: number, field: keyof CheckoutItemData, value: any) => {
     setCheckoutData(prev => ({
@@ -76,8 +159,50 @@ const CheckOut = () => {
     return checkoutData[index] || { media: [], approved: false };
   };
 
+  const handleSave = async () => {
+    try {
+      if (!clientId) return;
+      
+      // Find client by client number
+      const { data: clientData, error: clientError } = await supabase
+        .from('clients')
+        .select('id')
+        .eq('client_number', clientId)
+        .single();
+
+      if (clientError) throw clientError;
+
+      // Save or update checkout session
+      const { error: sessionError } = await supabase
+        .from('checkout_sessions')
+        .upsert({
+          client_id: clientData.id,
+          vehicle_details: vehicleDetails as any,
+          general_media: generalMedia as any,
+          checkout_items: checkoutData as any,
+          status: 'completed'
+        }, {
+          onConflict: 'client_id'
+        });
+
+      if (sessionError) throw sessionError;
+
+      toast({
+        title: t('data.saved.successfully'),
+        description: t('checkout.data.saved'),
+      });
+    } catch (error) {
+      console.error('Error saving checkout data:', error);
+      toast({
+        title: 'Error saving data',
+        description: 'Could not save checkout information.',
+      });
+    }
+  };
+
   const handleExport = () => {
     const exportData = {
+      clientId,
       vehicleDetails,
       generalMedia: generalMedia.map(item => ({ url: item.url, type: item.type })),
       checkoutItems: checkoutItems.map((item, index) => ({
@@ -91,7 +216,7 @@ const CheckOut = () => {
     const dataStr = JSON.stringify(exportData, null, 2);
     const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
     
-    const exportFileDefaultName = `checkout-${vehicleDetails.licensePlate || 'unknown'}-${new Date().toISOString().split('T')[0]}.json`;
+    const exportFileDefaultName = `checkout-${clientId}-${new Date().toISOString().split('T')[0]}.json`;
     
     const linkElement = document.createElement('a');
     linkElement.setAttribute('href', dataUri);
@@ -126,7 +251,14 @@ const CheckOut = () => {
           <h1 className="text-2xl font-semibold">{t('vehicle.checkout.page')}</h1>
         </div>
         <div className="flex items-center gap-4">
-          <Button onClick={handleExport} className="gap-2">
+          <div className="text-sm bg-primary/10 text-primary px-3 py-1 rounded-full border border-primary/20">
+            {t('client.id')}: <span className="font-mono font-semibold">{clientId}</span>
+          </div>
+          <Button onClick={handleSave} variant="default" className="gap-2">
+            <Download className="h-4 w-4" />
+            {t('save.data')}
+          </Button>
+          <Button onClick={handleExport} variant="outline" className="gap-2">
             <Download className="h-4 w-4" />
             {t('export.data')}
           </Button>

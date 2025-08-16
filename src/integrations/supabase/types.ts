@@ -146,6 +146,47 @@ export type Database = {
           },
         ]
       }
+      checkout_sessions: {
+        Row: {
+          checkout_items: Json
+          client_id: string
+          created_at: string
+          general_media: Json
+          id: string
+          status: string
+          updated_at: string
+          vehicle_details: Json
+        }
+        Insert: {
+          checkout_items?: Json
+          client_id: string
+          created_at?: string
+          general_media?: Json
+          id?: string
+          status?: string
+          updated_at?: string
+          vehicle_details?: Json
+        }
+        Update: {
+          checkout_items?: Json
+          client_id?: string
+          created_at?: string
+          general_media?: Json
+          id?: string
+          status?: string
+          updated_at?: string
+          vehicle_details?: Json
+        }
+        Relationships: [
+          {
+            foreignKeyName: "checkout_sessions_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       clients: {
         Row: {
           client_number: string
@@ -259,6 +300,47 @@ export type Database = {
             columns: ["part_id"]
             isOneToOne: false
             referencedRelation: "inventory_parts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      parts_service_sessions: {
+        Row: {
+          client_id: string
+          created_at: string
+          general_media: Json
+          id: string
+          parts_data: Json
+          status: string
+          updated_at: string
+          vehicle_details: Json
+        }
+        Insert: {
+          client_id: string
+          created_at?: string
+          general_media?: Json
+          id?: string
+          parts_data?: Json
+          status?: string
+          updated_at?: string
+          vehicle_details?: Json
+        }
+        Update: {
+          client_id?: string
+          created_at?: string
+          general_media?: Json
+          id?: string
+          parts_data?: Json
+          status?: string
+          updated_at?: string
+          vehicle_details?: Json
+        }
+        Relationships: [
+          {
+            foreignKeyName: "parts_service_sessions_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
             referencedColumns: ["id"]
           },
         ]
