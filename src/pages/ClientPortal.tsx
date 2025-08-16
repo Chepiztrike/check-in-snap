@@ -92,14 +92,17 @@ const ClientPortal = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (clientId) {
+    if (clientId && !loading) {
       loadClientData();
     }
-  }, [clientId]);
+  }, [clientId]); // Remove loading dependency to prevent loops
 
   const loadClientData = async () => {
     try {
       console.log('Loading client data for:', clientId);
+      
+      // Prevent multiple simultaneous loads
+      if (loading) return;
       
       // Load client info
       const { data: clientData, error: clientError } = await supabase
@@ -123,11 +126,13 @@ const ClientPortal = () => {
       console.log('Client data loaded:', clientData);
       setClient(clientData);
 
-      // Load checkin data
+      // Load checkin data - handle multiple records by taking the most recent
       const { data: checkinData, error: checkinError } = await supabase
         .from('checkins')
         .select('*')
         .eq('client_id', clientData.id)
+        .order('created_at', { ascending: false })
+        .limit(1)
         .maybeSingle();
 
       if (checkinError) {
@@ -210,8 +215,11 @@ const ClientPortal = () => {
       }
     } catch (error) {
       console.error('Error loading client data:', error);
-      toast.error('Client not found');
-      navigate('/');
+      // Prevent infinite re-renders by not calling navigate on every error
+      if (!client) {
+        toast.error('Client not found');
+        setTimeout(() => navigate('/'), 100); // Delay navigation to prevent render loop
+      }
     } finally {
       setLoading(false);
     }
