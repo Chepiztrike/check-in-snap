@@ -295,15 +295,9 @@ const ClientPortal = () => {
   const getProgressPercentage = () => {
     if (!checkin) return 0;
     
-    let progress = 25; // Base progress for checkin creation
-    if (checkin.checkin_approved) progress += 25;
-    if (serviceApprovals.length > 0) {
-      const approvedServices = serviceApprovals.filter(s => s.approved).length;
-      progress += (approvedServices / serviceApprovals.length) * 25;
-    } else {
-      progress += 25; // No services needed
-    }
-    if (checkin.checkout_approved) progress += 25;
+    let progress = 33.33; // Base progress for checkin creation
+    if (checkin.checkin_approved) progress += 33.33; // Check-in approval
+    if (checkin.checkout_approved) progress += 33.34; // Check-out approval
     
     return Math.min(progress, 100);
   };
@@ -473,7 +467,7 @@ const ClientPortal = () => {
             <CardContent className="space-y-4">
               <div className="text-center">
                 <div className="text-2xl font-bold text-primary">{checkinItems.length}</div>
-                <div className="text-sm text-muted-foreground">{t('inspection.items')}</div>
+                <div className="text-sm text-muted-foreground">{t('checkin.bullets')}</div>
               </div>
               <div className="text-center">
                 <div className="text-2xl font-bold text-amber-600">
@@ -508,7 +502,7 @@ const ClientPortal = () => {
           <CardContent>
             <div className="space-y-4">
               <Progress value={getProgressPercentage()} className="w-full" />
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div className="flex items-center gap-2">
                   <CheckCircle className={`h-5 w-5 ${checkin ? 'text-green-500' : 'text-muted-foreground'}`} />
                   <span className="text-sm">{t('vehicle.received')}</span>
@@ -516,10 +510,6 @@ const ClientPortal = () => {
                 <div className="flex items-center gap-2">
                   <CheckCircle className={`h-5 w-5 ${checkin?.checkin_approved ? 'text-green-500' : 'text-muted-foreground'}`} />
                   <span className="text-sm">{t('checkin.approved.text')}</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <CheckCircle className={`h-5 w-5 ${serviceApprovals.length === 0 || serviceApprovals.every(s => s.approved) ? 'text-green-500' : 'text-muted-foreground'}`} />
-                  <span className="text-sm">{t('services.approved')}</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <CheckCircle className={`h-5 w-5 ${checkin?.checkout_approved ? 'text-green-500' : 'text-muted-foreground'}`} />
