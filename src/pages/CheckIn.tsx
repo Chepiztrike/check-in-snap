@@ -227,10 +227,6 @@ const CheckIn = () => {
     } catch (error) {
       console.error('Error generating client ID:', error);
       toast.error('Failed to generate client ID');
-      // Retry once more in case of conflict
-      setTimeout(() => {
-        generateClientAndId();
-      }, 1000);
     }
   };
 
