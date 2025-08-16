@@ -239,7 +239,13 @@ const translations = {
     'client.id.copied': 'Client ID copied to clipboard',
     'tracking.url.copied': 'Tracking URL copied to clipboard',
     'copied': 'Copied!',
-    'copy': 'Copy'
+    'copy': 'Copy',
+    
+    // Client portal enhancements
+    'inspection.results': 'Inspection Results',
+    'detailed.inspection.findings': 'Detailed findings from your vehicle inspection',
+    'service.required': 'Service Required',
+    'uploaded.media': 'Uploaded Media'
   },
   es: {
     // Index page
@@ -471,7 +477,13 @@ const translations = {
     'client.id.copied': 'ID de cliente copiado al portapapeles',
     'tracking.url.copied': 'URL de seguimiento copiada al portapapeles',
     'copied': '¡Copiado!',
-    'copy': 'Copiar'
+    'copy': 'Copiar',
+    
+    // Client portal enhancements
+    'inspection.results': 'Resultados de Inspección',
+    'detailed.inspection.findings': 'Hallazgos detallados de la inspección de tu vehículo',
+    'service.required': 'Servicio Requerido',
+    'uploaded.media': 'Medios Subidos'
   }
 };
 

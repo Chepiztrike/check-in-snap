@@ -6,11 +6,13 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/textarea";
 import { Progress } from "@/components/ui/progress";
-import { CheckCircle, Clock, AlertCircle, Car, Phone, Mail } from "lucide-react";
+import { CheckCircle, Clock, AlertCircle, Car, Phone, Mail, Home, Image, Video, FileText, Wrench } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useLanguage } from "@/contexts/LanguageContext";
 import LanguageToggle from "@/components/LanguageToggle";
+
+const SUPABASE_URL = "https://fdrqyrbxajmptwlbnhet.supabase.co";
 
 interface Client {
   id: string;
@@ -32,6 +34,21 @@ interface Checkin {
   created_at: string;
 }
 
+interface CheckinItem {
+  id: string;
+  item_key: string;
+  notes: string;
+  result: string;
+  checkin_id: string;
+}
+
+interface CheckinMedia {
+  id: string;
+  file_path: string;
+  media_type: string;
+  checkin_id: string;
+}
+
 interface ServiceApproval {
   id: string;
   service_description: string;
@@ -46,6 +63,8 @@ const ClientPortal = () => {
   const { t } = useLanguage();
   const [client, setClient] = useState<Client | null>(null);
   const [checkin, setCheckin] = useState<Checkin | null>(null);
+  const [checkinItems, setCheckinItems] = useState<CheckinItem[]>([]);
+  const [checkinMedia, setCheckinMedia] = useState<CheckinMedia[]>([]);
   const [serviceApprovals, setServiceApprovals] = useState<ServiceApproval[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -76,6 +95,22 @@ const ClientPortal = () => {
 
       if (checkinData) {
         setCheckin(checkinData);
+
+        // Load checkin items
+        const { data: itemsData, error: itemsError } = await supabase
+          .from('checkin_items')
+          .select('*')
+          .eq('checkin_id', checkinData.id);
+
+        if (itemsData) setCheckinItems(itemsData);
+
+        // Load checkin media
+        const { data: mediaData, error: mediaError } = await supabase
+          .from('checkin_media')
+          .select('*')
+          .eq('checkin_id', checkinData.id);
+
+        if (mediaData) setCheckinMedia(mediaData);
 
         // Load service approvals
         const { data: approvalsData, error: approvalsError } = await supabase
@@ -175,6 +210,48 @@ const ClientPortal = () => {
     return Math.min(progress, 100);
   };
 
+  const getItemName = (itemKey: string) => {
+    const itemMap: Record<string, string> = {
+      'scratches_dents': t('check.scratches.dents'),
+      'bumpers_panels': t('inspect.bumpers.panels'),
+      'lights': t('examine.lights'),
+      'rust_corrosion': t('look.rust.corrosion'),
+      'mirrors_glass': t('check.mirrors.glass'),
+      'existing_damage': t('document.existing.damage'),
+      'seats_adjustments': t('test.seats.adjustments'),
+      'dashboard_cluster': t('check.dashboard.cluster'),
+      'ac_heating': t('verify.ac.heating'),
+      'radio_infotainment': t('test.radio.infotainment'),
+      'upholstery': t('inspect.upholstery'),
+      'seatbelts_safety': t('check.seatbelts.safety'),
+      'fluid_levels': t('check.fluid.levels'),
+      'belts_hoses': t('inspect.belts.hoses'),
+      'leaks_corrosion': t('look.leaks.corrosion'),
+      'battery_terminals': t('check.battery.terminals'),
+      'air_filter': t('examine.air.filter'),
+      'unusual_sounds': t('note.unusual.sounds'),
+      'tire_tread': t('check.tire.tread'),
+      'cuts_bulges': t('inspect.cuts.bulges'),
+      'tire_pressure': t('verify.tire.pressure'),
+      'wheel_rims': t('examine.wheel.rims'),
+      'spare_tire': t('check.spare.tire'),
+      'alignment_issues': t('look.alignment.issues'),
+      'engine_light': t('check.engine.light'),
+      'dashboard_lights': t('verify.dashboard.lights'),
+      'active_warnings': t('note.active.warnings'),
+      'hazard_indicators': t('test.hazard.indicators'),
+      'fuel_gauges': t('check.fuel.gauges'),
+      'error_codes': t('document.error.codes')
+    };
+    return itemMap[itemKey] || itemKey;
+  };
+
+  const getMediaIcon = (mediaType: string) => {
+    if (mediaType.startsWith('image/')) return <Image className="h-4 w-4" />;
+    if (mediaType.startsWith('video/')) return <Video className="h-4 w-4" />;
+    return <FileText className="h-4 w-4" />;
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
@@ -216,7 +293,13 @@ const ClientPortal = () => {
             <h1 className="text-3xl font-bold">{t('client.portal')}</h1>
             <p className="text-muted-foreground">{t('track.service.progress')}</p>
           </div>
-          <LanguageToggle />
+          <div className="flex items-center gap-4">
+            <Button variant="outline" onClick={() => navigate('/')} className="flex items-center gap-2">
+              <Home className="h-4 w-4" />
+              {t('return.home')}
+            </Button>
+            <LanguageToggle />
+          </div>
         </div>
 
         {/* Client Info Card */}
@@ -244,6 +327,26 @@ const ClientPortal = () => {
                 </div>
               </div>
             </div>
+            
+            {checkin && (
+              <div className="mt-4 pt-4 border-t">
+                <h4 className="font-medium mb-2">{t('vehicle.details')}</h4>
+                <div className="grid grid-cols-2 gap-4 text-sm">
+                  <div>
+                    <span className="text-muted-foreground">{t('license.plate')}: </span>
+                    <span className="font-medium">{checkin.plate}</span>
+                  </div>
+                  <div>
+                    <span className="text-muted-foreground">{t('mileage')}: </span>
+                    <span className="font-medium">{checkin.mileage}</span>
+                  </div>
+                  <div className="col-span-2">
+                    <span className="text-muted-foreground">{t('vin')}: </span>
+                    <span className="font-medium font-mono text-xs">{checkin.vehicle_vin}</span>
+                  </div>
+                </div>
+              </div>
+            )}
           </CardContent>
         </Card>
 
@@ -277,6 +380,82 @@ const ClientPortal = () => {
             </div>
           </CardContent>
         </Card>
+
+        {/* Inspection Checklist Results */}
+        {checkinItems.length > 0 && (
+          <Card className="mb-6">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <CheckCircle className="h-5 w-5" />
+                {t('inspection.results')}
+              </CardTitle>
+              <CardDescription>
+                {t('detailed.inspection.findings')}
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                {checkinItems.map((item) => {
+                  const itemMedia = checkinMedia.filter(m => m.checkin_id === item.checkin_id);
+                  const hasServiceIssue = item.result === 'service_needed';
+                  
+                  return (
+                    <div key={item.id} className="border rounded-lg p-4">
+                      <div className="flex justify-between items-start mb-2">
+                        <h4 className="font-medium">{getItemName(item.item_key)}</h4>
+                        <div className="flex items-center gap-2">
+                          {hasServiceIssue && (
+                            <Badge variant="destructive" className="flex items-center gap-1">
+                              <Wrench className="h-3 w-3" />
+                              {t('service.required')}
+                            </Badge>
+                          )}
+                          {itemMedia.length > 0 && (
+                            <Badge variant="secondary" className="flex items-center gap-1">
+                              {getMediaIcon(itemMedia[0].media_type)}
+                              {itemMedia.length} {itemMedia.length === 1 ? t('file') : t('files')}
+                            </Badge>
+                          )}
+                        </div>
+                      </div>
+                      
+                      {item.notes && (
+                        <p className="text-sm text-muted-foreground mb-2">
+                          {t('notes')}: {item.notes}
+                        </p>
+                      )}
+                      
+                      {itemMedia.length > 0 && (
+                        <div className="mt-3">
+                          <p className="text-sm font-medium mb-2">{t('uploaded.media')}:</p>
+                          <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+                            {itemMedia.map((media) => (
+                              <div key={media.id} className="relative group">
+                                {media.media_type.startsWith('image/') ? (
+                                  <img
+                                    src={`${SUPABASE_URL}/storage/v1/object/public/checkins/${media.file_path}`}
+                                    alt="Inspection media"
+                                    className="w-full h-20 object-cover rounded border cursor-pointer hover:opacity-80"
+                                    onClick={() => window.open(`${SUPABASE_URL}/storage/v1/object/public/checkins/${media.file_path}`, '_blank')}
+                                  />
+                                ) : (
+                                  <div className="w-full h-20 bg-muted rounded border flex items-center justify-center cursor-pointer hover:bg-muted/80"
+                                       onClick={() => window.open(`${SUPABASE_URL}/storage/v1/object/public/checkins/${media.file_path}`, '_blank')}>
+                                    {getMediaIcon(media.media_type)}
+                                  </div>
+                                )}
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            </CardContent>
+          </Card>
+        )}
 
         {/* Check-in Approval */}
         {checkin && !checkin.checkin_approved && (
