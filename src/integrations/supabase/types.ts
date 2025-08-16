@@ -92,7 +92,7 @@ export type Database = {
           client_notes: string | null
           created_at: string
           id: string
-          mechanic_id: string
+          mechanic_id: string | null
           mileage: number | null
           plate: string | null
           status: string
@@ -106,7 +106,7 @@ export type Database = {
           client_notes?: string | null
           created_at?: string
           id?: string
-          mechanic_id: string
+          mechanic_id?: string | null
           mileage?: number | null
           plate?: string | null
           status?: string
@@ -120,7 +120,7 @@ export type Database = {
           client_notes?: string | null
           created_at?: string
           id?: string
-          mechanic_id?: string
+          mechanic_id?: string | null
           mileage?: number | null
           plate?: string | null
           status?: string

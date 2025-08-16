@@ -260,7 +260,7 @@ const CheckIn = () => {
         .from('checkins')
         .insert({
           client_id: clientId,
-          mechanic_id: '00000000-0000-0000-0000-000000000000', // Placeholder
+          mechanic_id: null, // No mechanic required for demo
           vehicle_vin: vin,
           plate: plate,
           mileage: parseInt(mileage) || 0,
