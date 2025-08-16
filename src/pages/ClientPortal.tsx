@@ -523,7 +523,7 @@ const ClientPortal = () => {
 
         {/* Check-in Approval */}
         {checkin && !checkin.checkin_approved && (
-          <Card className="mb-6">
+          <Card className="mb-6 border-amber-200">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <AlertCircle className="h-5 w-5 text-amber-500" />
@@ -533,19 +533,120 @@ const ClientPortal = () => {
                 {t('review.approve.vehicle.inspection')}
               </CardDescription>
             </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <p className="text-sm font-medium">{t('license.plate')}</p>
-                    <p className="text-muted-foreground">{checkin.plate}</p>
+            <CardContent className="space-y-6">
+              
+              {/* Vehicle Information Summary */}
+              <div className="bg-muted/50 rounded-lg p-4">
+                <h4 className="font-semibold mb-3 text-foreground">{t('vehicle.information')}</h4>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="space-y-1">
+                    <p className="text-sm font-medium text-muted-foreground">{t('license.plate')}</p>
+                    <p className="font-medium">{checkin.plate || t('not.provided')}</p>
                   </div>
-                  <div>
-                    <p className="text-sm font-medium">{t('mileage')}</p>
-                    <p className="text-muted-foreground">{checkin.mileage}</p>
+                  <div className="space-y-1">
+                    <p className="text-sm font-medium text-muted-foreground">{t('mileage')}</p>
+                    <p className="font-medium">{checkin.mileage ? `${checkin.mileage} km` : t('not.provided')}</p>
+                  </div>
+                  <div className="space-y-1">
+                    <p className="text-sm font-medium text-muted-foreground">{t('vehicle.vin')}</p>
+                    <p className="font-medium">{checkin.vehicle_vin || t('not.provided')}</p>
                   </div>
                 </div>
-                <Button onClick={handleApproveCheckin} className="w-full">
+                {checkin.client_notes && (
+                  <div className="mt-3 pt-3 border-t">
+                    <p className="text-sm font-medium text-muted-foreground mb-1">{t('client.notes')}</p>
+                    <p className="text-sm bg-background/60 p-2 rounded">{checkin.client_notes}</p>
+                  </div>
+                )}
+              </div>
+
+              {/* Complete Inspection Results */}
+              <div className="bg-muted/50 rounded-lg p-4">
+                <h4 className="font-semibold mb-3 text-foreground">{t('complete.inspection.results')}</h4>
+                <div className="space-y-3">
+                  {checkinItems.length === 0 ? (
+                    <p className="text-sm text-muted-foreground italic">{t('no.inspection.data')}</p>
+                  ) : (
+                    checkinItems.map((item) => {
+                      const itemMedia = checkinMedia.filter(m => m.checkin_id === item.checkin_id);
+                      const needsService = item.result === 'service_needed' || item.service_needed;
+                      
+                      return (
+                        <div key={item.id} className={`border rounded p-3 ${needsService ? 'border-amber-300 bg-amber-50/50' : 'border-green-300 bg-green-50/50'}`}>
+                          <div className="flex justify-between items-start mb-2">
+                            <div className="flex items-center gap-2 flex-1">
+                              {needsService ? (
+                                <AlertCircle className="h-4 w-4 text-amber-600 flex-shrink-0" />
+                              ) : (
+                                <CheckCircle className="h-4 w-4 text-green-600 flex-shrink-0" />
+                              )}
+                              <h5 className="font-medium text-sm">{getItemName(item.item_key)}</h5>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              {needsService ? (
+                                <Badge variant="destructive" className="text-xs">
+                                  {t('service.required')}
+                                </Badge>
+                              ) : (
+                                <Badge variant="default" className="text-xs bg-green-600">
+                                  {t('passed')}
+                                </Badge>
+                              )}
+                              {itemMedia.length > 0 && (
+                                <Badge variant="secondary" className="text-xs">
+                                  {itemMedia.length} {itemMedia.length === 1 ? t('file') : t('files')}
+                                </Badge>
+                              )}
+                            </div>
+                          </div>
+                          
+                          {item.notes && (
+                            <div className="mb-2 p-2 bg-background/60 rounded text-xs">
+                              <span className="font-medium">{t('notes')}: </span>
+                              <span>{item.notes}</span>
+                            </div>
+                          )}
+                          
+                          {itemMedia.length > 0 && (
+                            <div className="grid grid-cols-4 gap-1 mt-2">
+                              {itemMedia.slice(0, 4).map((media) => (
+                                <div key={media.id} className="relative">
+                                  {media.media_type.startsWith('image/') ? (
+                                    <img
+                                      src={`${SUPABASE_URL}/storage/v1/object/public/checkins/${media.file_path}`}
+                                      alt="Evidence"
+                                      className="w-full h-12 object-cover rounded cursor-pointer hover:opacity-80"
+                                      onClick={() => window.open(`${SUPABASE_URL}/storage/v1/object/public/checkins/${media.file_path}`, '_blank')}
+                                    />
+                                  ) : (
+                                    <div className="w-full h-12 bg-muted rounded flex items-center justify-center cursor-pointer hover:bg-muted/80"
+                                         onClick={() => window.open(`${SUPABASE_URL}/storage/v1/object/public/checkins/${media.file_path}`, '_blank')}>
+                                      {getMediaIcon(media.media_type)}
+                                    </div>
+                                  )}
+                                </div>
+                              ))}
+                              {itemMedia.length > 4 && (
+                                <div className="w-full h-12 bg-muted rounded flex items-center justify-center text-xs font-medium">
+                                  +{itemMedia.length - 4}
+                                </div>
+                              )}
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })
+                  )}
+                </div>
+              </div>
+
+              <Separator />
+              
+              <div className="text-center">
+                <p className="text-sm text-muted-foreground mb-4">
+                  {t('review.all.information.approve')}
+                </p>
+                <Button onClick={handleApproveCheckin} className="w-full" size="lg">
                   {t('approve.checkin')}
                 </Button>
               </div>
@@ -610,20 +711,90 @@ const ClientPortal = () => {
         {checkin && checkin.checkin_approved && 
          (serviceApprovals.length === 0 || serviceApprovals.every(s => s.approved)) && 
          !checkin.checkout_approved && (
-          <Card className="mb-6">
+          <Card className="mb-6 border-blue-200">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <AlertCircle className="h-5 w-5 text-amber-500" />
+                <AlertCircle className="h-5 w-5 text-blue-500" />
                 {t('checkout.approval.required')}
               </CardTitle>
               <CardDescription>
                 {t('final.inspection.complete')}
               </CardDescription>
             </CardHeader>
-            <CardContent>
-              <Button onClick={handleApproveCheckout} className="w-full">
-                {t('approve.checkout')}
-              </Button>
+            <CardContent className="space-y-6">
+              
+              {/* Checkout Summary */}
+              <div className="bg-blue-50/50 rounded-lg p-4">
+                <h4 className="font-semibold mb-3 text-blue-700">{t('final.inspection.summary')}</h4>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="space-y-1">
+                    <p className="text-sm font-medium text-muted-foreground">{t('license.plate')}</p>
+                    <p className="font-medium">{checkin.plate || t('not.provided')}</p>
+                  </div>
+                  <div className="space-y-1">
+                    <p className="text-sm font-medium text-muted-foreground">{t('final.mileage')}</p>
+                    <p className="font-medium">{checkin.mileage ? `${checkin.mileage} km` : t('not.provided')}</p>
+                  </div>
+                  <div className="space-y-1">
+                    <p className="text-sm font-medium text-muted-foreground">{t('checkout.date')}</p>
+                    <p className="font-medium">{new Date().toLocaleDateString()}</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Service Work Summary */}
+              {serviceApprovals.length > 0 && (
+                <div className="bg-green-50/50 rounded-lg p-4">
+                  <h4 className="font-semibold mb-3 text-green-700">{t('completed.services')}</h4>
+                  <div className="space-y-2">
+                    {serviceApprovals.map((approval) => (
+                      <div key={approval.id} className="flex justify-between items-center p-2 bg-background/60 rounded">
+                        <span className="text-sm font-medium">{approval.service_description}</span>
+                        <Badge variant="default" className="bg-green-600 text-xs">
+                          {t('completed')}
+                        </Badge>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Quality Checks */}
+              <div className="bg-muted/50 rounded-lg p-4">
+                <h4 className="font-semibold mb-3 text-foreground">{t('final.quality.checks')}</h4>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  {[
+                    t('exterior.no.damage'),
+                    t('interior.cleanliness'),
+                    t('lights.functioning'),
+                    t('engine.compartment.inspection'),
+                    t('fluid.levels.checked'),
+                    t('tire.condition.pressure'),
+                    t('battery.terminals.connections'),
+                    t('windshield.mirrors.clean'),
+                    t('service.work.completed'),
+                    t('tools.equipment.removed'),
+                    t('test.drive.completed'),
+                    t('customer.walkthrough.completed')
+                  ].map((check, index) => (
+                    <div key={index} className="flex items-center gap-2 p-2 bg-background/60 rounded">
+                      <CheckCircle className="h-4 w-4 text-green-600 flex-shrink-0" />
+                      <span className="text-sm">{check}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <Separator />
+              
+              <div className="text-center">
+                <p className="text-sm text-muted-foreground mb-4">
+                  {t('confirm.vehicle.ready.pickup')}
+                </p>
+                <Button onClick={handleApproveCheckout} className="w-full" size="lg">
+                  {t('approve.checkout')}
+                </Button>
+              </div>
             </CardContent>
           </Card>
         )}

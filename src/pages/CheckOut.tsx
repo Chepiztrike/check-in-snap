@@ -141,14 +141,15 @@ const CheckOut = () => {
             <CardTitle>{t('vehicle.details')}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <Label htmlFor="customerName">{t('customer.name')}</Label>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+              <div className="space-y-1">
+                <Label htmlFor="customerName" className="text-xs sm:text-sm">{t('customer.name')}</Label>
                 <Input
                   id="customerName"
                   value={vehicleDetails.customerName}
                   onChange={(e) => setVehicleDetails({...vehicleDetails, customerName: e.target.value})}
                   placeholder={t('enter.customer.name')}
+                  className="text-sm"
                 />
               </div>
               <div>
