@@ -99,12 +99,8 @@ const ClientPortal = () => {
 
   const loadClientData = async () => {
     try {
+      setLoading(true);
       console.log('Loading client data for:', clientId);
-      
-      // Prevent multiple simultaneous loads
-      if (loading) return;
-      
-      // Load client info
       const { data: clientData, error: clientError } = await supabase
         .from('clients')
         .select('*')
