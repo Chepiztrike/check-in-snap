@@ -86,6 +86,10 @@ export type Database = {
       }
       checkins: {
         Row: {
+          checkin_approved: boolean | null
+          checkout_approved: boolean | null
+          client_id: string | null
+          client_notes: string | null
           created_at: string
           id: string
           mechanic_id: string
@@ -96,6 +100,10 @@ export type Database = {
           vehicle_vin: string | null
         }
         Insert: {
+          checkin_approved?: boolean | null
+          checkout_approved?: boolean | null
+          client_id?: string | null
+          client_notes?: string | null
           created_at?: string
           id?: string
           mechanic_id: string
@@ -106,6 +114,10 @@ export type Database = {
           vehicle_vin?: string | null
         }
         Update: {
+          checkin_approved?: boolean | null
+          checkout_approved?: boolean | null
+          client_id?: string | null
+          client_notes?: string | null
           created_at?: string
           id?: string
           mechanic_id?: string
@@ -114,6 +126,44 @@ export type Database = {
           status?: string
           updated_at?: string
           vehicle_vin?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "checkins_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      clients: {
+        Row: {
+          client_number: string
+          created_at: string
+          customer_email: string | null
+          customer_name: string
+          customer_phone: string | null
+          id: string
+          updated_at: string
+        }
+        Insert: {
+          client_number: string
+          created_at?: string
+          customer_email?: string | null
+          customer_name: string
+          customer_phone?: string | null
+          id?: string
+          updated_at?: string
+        }
+        Update: {
+          client_number?: string
+          created_at?: string
+          customer_email?: string | null
+          customer_name?: string
+          customer_phone?: string | null
+          id?: string
+          updated_at?: string
         }
         Relationships: []
       }
@@ -204,6 +254,60 @@ export type Database = {
           },
         ]
       }
+      service_approvals: {
+        Row: {
+          approved: boolean | null
+          approved_at: string | null
+          checkin_id: string
+          client_notes: string | null
+          created_at: string
+          estimated_cost: number | null
+          id: string
+          part_request_id: string | null
+          service_description: string
+          updated_at: string
+        }
+        Insert: {
+          approved?: boolean | null
+          approved_at?: string | null
+          checkin_id: string
+          client_notes?: string | null
+          created_at?: string
+          estimated_cost?: number | null
+          id?: string
+          part_request_id?: string | null
+          service_description: string
+          updated_at?: string
+        }
+        Update: {
+          approved?: boolean | null
+          approved_at?: string | null
+          checkin_id?: string
+          client_notes?: string | null
+          created_at?: string
+          estimated_cost?: number | null
+          id?: string
+          part_request_id?: string | null
+          service_description?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "service_approvals_checkin_id_fkey"
+            columns: ["checkin_id"]
+            isOneToOne: false
+            referencedRelation: "checkins"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "service_approvals_part_request_id_fkey"
+            columns: ["part_request_id"]
+            isOneToOne: false
+            referencedRelation: "part_requests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_roles: {
         Row: {
           id: string
@@ -227,6 +331,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      generate_client_number: {
+        Args: Record<PropertyKey, never>
+        Returns: string
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
