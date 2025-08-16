@@ -104,9 +104,9 @@ const Login = () => {
                    >
                      <div className="text-left w-full pr-2">
                        <div className="font-medium text-base mb-2 line-clamp-1">{option.title}</div>
-                       <div className="text-sm text-muted-foreground leading-tight line-clamp-2">
-                         {option.description}
-                       </div>
+                        <div className="text-sm font-medium leading-tight line-clamp-2 group-hover:text-white">
+                          {option.description}
+                        </div>
                      </div>
                    </Button>
                 ))}
