@@ -299,6 +299,67 @@ const ClientPortal = () => {
   };
 
   const getItemName = (itemKey: string) => {
+    // Handle new format: step_index (e.g., "exterior_0", "interior_1")
+    if (itemKey.includes('_')) {
+      const [stepKey, indexStr] = itemKey.split('_');
+      const index = parseInt(indexStr);
+      
+      const stepMappings: Record<string, string[]> = {
+        exterior: [
+          t('check.scratches.dents'),
+          t('inspect.bumpers.panels'),
+          t('examine.lights'),
+          t('look.rust.corrosion'),
+          t('check.mirrors.glass'),
+          t('document.existing.damage')
+        ],
+        interior: [
+          t('test.seats.adjustments'),
+          t('check.dashboard.cluster'),
+          t('verify.ac.heating'),
+          t('test.radio.infotainment'),
+          t('inspect.upholstery'),
+          t('check.seatbelts.safety')
+        ],
+        engine: [
+          t('check.fluid.levels'),
+          t('inspect.belts.hoses'),
+          t('look.leaks.corrosion'),
+          t('check.battery.terminals'),
+          t('examine.air.filter'),
+          t('note.unusual.sounds')
+        ],
+        wheels: [
+          t('check.tire.tread'),
+          t('inspect.cuts.bulges'),
+          t('verify.tire.pressure'),
+          t('examine.wheel.rims'),
+          t('check.spare.tire'),
+          t('look.alignment.issues')
+        ],
+        warnings: [
+          t('check.engine.light'),
+          t('verify.dashboard.lights'),
+          t('note.active.warnings'),
+          t('test.hazard.indicators'),
+          t('check.fuel.gauges'),
+          t('document.error.codes')
+        ],
+        final: [
+          t('overall.vehicle.assessment'),
+          t('additional.concerns'),
+          t('customer.specific.requests'),
+          t('recommended.maintenance'),
+          t('schedule.followup')
+        ]
+      };
+      
+      if (stepMappings[stepKey] && stepMappings[stepKey][index]) {
+        return stepMappings[stepKey][index];
+      }
+    }
+
+    // Fallback for old format
     const itemMap: Record<string, string> = {
       'scratches_dents': t('check.scratches.dents'),
       'bumpers_panels': t('inspect.bumpers.panels'),

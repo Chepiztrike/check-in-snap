@@ -256,7 +256,7 @@ const CheckIn = () => {
       if (clientUpdateError) throw clientUpdateError;
 
       // Create the check-in record with car model and year
-      const { error: checkinError } = await supabase
+      const { data: checkinData, error: checkinError } = await supabase
         .from('checkins')
         .insert({
           client_id: clientId,
@@ -266,11 +266,93 @@ const CheckIn = () => {
           mileage: parseInt(mileage) || 0,
           car_model: carModel,
           car_year: carYear,
-          status: 'submitted'
-        });
+          status: 'submitted',
+          client_notes: data.final?.notes || ''
+        })
+        .select()
+        .single();
 
       if (checkinError) throw checkinError;
 
+      const checkinId = checkinData.id;
+
+      // Save all checklist items from each step
+      const checkinItems = [];
+      const mediaFiles = [];
+
+      // Process each step (excluding vehicle step)
+      for (const step of stepsConfig.slice(1)) { // Skip vehicle step
+        const stepData = data[step.key];
+        if (!stepData) continue;
+
+        // Process checklist items for this step
+        if (step.checklist && stepData.checklistService) {
+          for (let i = 0; i < step.checklist.length; i++) {
+            const itemText = step.checklist[i];
+            const serviceNeeded = stepData.checklistService[i] || false;
+            
+            // Create item key from step and index
+            const itemKey = `${step.key}_${i}`;
+            
+            checkinItems.push({
+              checkin_id: checkinId,
+              item_key: itemKey,
+              result: serviceNeeded ? 'service_needed' : 'passed',
+              service_needed: serviceNeeded,
+              notes: itemText
+            });
+
+            // Add media for this checklist item if any
+            if (stepData.checklistMedia && stepData.checklistMedia[i]) {
+              for (const media of stepData.checklistMedia[i]) {
+                mediaFiles.push({
+                  checkin_id: checkinId,
+                  file_path: media.path,
+                  media_type: media.file.type
+                });
+              }
+            }
+          }
+        }
+
+        // Add general media for this step
+        if (stepData.media) {
+          for (const media of stepData.media) {
+            mediaFiles.push({
+              checkin_id: checkinId,
+              file_path: media.path,
+              media_type: media.file.type
+            });
+          }
+        }
+      }
+
+      // Save checkin items to database
+      if (checkinItems.length > 0) {
+        const { error: itemsError } = await supabase
+          .from('checkin_items')
+          .insert(checkinItems);
+
+        if (itemsError) {
+          console.error('Error saving checkin items:', itemsError);
+          throw itemsError;
+        }
+      }
+
+      // Save media files to database
+      if (mediaFiles.length > 0) {
+        const { error: mediaError } = await supabase
+          .from('checkin_media')
+          .insert(mediaFiles);
+
+        if (mediaError) {
+          console.error('Error saving checkin media:', mediaError);
+          throw mediaError;
+        }
+      }
+
+      toast.success('Check-in completed successfully!');
+      
       // Navigate to completion screen
       navigate(`/check-in-complete/${clientNumber}`);
     } catch (error) {
