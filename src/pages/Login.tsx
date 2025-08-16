@@ -99,16 +99,16 @@ const Login = () => {
                    <Button
                      key={index}
                      variant="outline"
-                     className="w-full justify-start h-auto p-4 min-h-[80px]"
+                     className="w-full justify-start h-auto p-4 min-h-[100px] overflow-hidden"
                      onClick={() => navigate(option.href)}
                    >
-                     <div className="text-left min-w-0 flex-1">
-                       <div className="font-medium truncate">{option.title}</div>
-                       <div className="text-sm text-muted-foreground mt-1 leading-relaxed break-words">
+                     <div className="text-left w-full pr-2">
+                       <div className="font-medium text-base mb-2 line-clamp-1">{option.title}</div>
+                       <div className="text-sm text-muted-foreground leading-tight line-clamp-2">
                          {option.description}
                        </div>
                      </div>
-                  </Button>
+                   </Button>
                 ))}
               </CardContent>
             </Card>
@@ -143,13 +143,25 @@ const Login = () => {
                   </Button>
                 </div>
                 <Separator />
-                <div className="text-center text-sm text-muted-foreground space-y-2">
-                  <p className="break-words">{t('client.portal.features')}</p>
-                  <ul className="text-xs space-y-1 text-left max-w-full">
-                    <li className="break-words">• {t('view.inspection.results')}</li>
-                    <li className="break-words">• {t('approve.services')}</li>
-                    <li className="break-words">• {t('track.real.time')}</li>
-                    <li className="break-words">• {t('approve.checkout')}</li>
+                <div className="px-2 py-3 bg-muted/30 rounded-lg">
+                  <p className="text-sm font-medium text-center mb-3 text-foreground">{t('client.portal.features')}</p>
+                  <ul className="text-xs space-y-2 max-w-full">
+                    <li className="flex items-start gap-2">
+                      <span className="text-accent flex-shrink-0">•</span>
+                      <span className="break-words">{t('view.inspection.results')}</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-accent flex-shrink-0">•</span>
+                      <span className="break-words">{t('approve.services')}</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-accent flex-shrink-0">•</span>
+                      <span className="break-words">{t('track.real.time')}</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-accent flex-shrink-0">•</span>
+                      <span className="break-words">{t('approve.checkout')}</span>
+                    </li>
                   </ul>
                 </div>
               </CardContent>
