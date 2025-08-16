@@ -89,25 +89,25 @@ const Login = () => {
                 <div className="w-16 h-16 mx-auto rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center mb-4">
                   <Wrench className="w-8 h-8 text-primary-foreground" />
                 </div>
-                <CardTitle className="text-2xl">{t('mechanic.access')}</CardTitle>
-                <CardDescription>
+                <CardTitle className="text-2xl break-words">{t('mechanic.access')}</CardTitle>
+                <CardDescription className="break-words leading-relaxed">
                   {t('mechanic.access.description')}
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 {mechanicOptions.map((option, index) => (
-                  <Button
-                    key={index}
-                    variant="outline"
-                    className="w-full justify-start h-auto p-4"
-                    onClick={() => navigate(option.href)}
-                  >
-                    <div className="text-left">
-                      <div className="font-medium">{option.title}</div>
-                      <div className="text-sm text-muted-foreground mt-1">
-                        {option.description}
-                      </div>
-                    </div>
+                   <Button
+                     key={index}
+                     variant="outline"
+                     className="w-full justify-start h-auto p-4 min-h-[80px]"
+                     onClick={() => navigate(option.href)}
+                   >
+                     <div className="text-left min-w-0 flex-1">
+                       <div className="font-medium truncate">{option.title}</div>
+                       <div className="text-sm text-muted-foreground mt-1 leading-relaxed break-words">
+                         {option.description}
+                       </div>
+                     </div>
                   </Button>
                 ))}
               </CardContent>
@@ -119,8 +119,8 @@ const Login = () => {
                 <div className="w-16 h-16 mx-auto rounded-full bg-gradient-to-br from-accent to-primary flex items-center justify-center mb-4">
                   <User className="w-8 h-8 text-primary-foreground" />
                 </div>
-                <CardTitle className="text-2xl">{t('client.access')}</CardTitle>
-                <CardDescription>
+                <CardTitle className="text-2xl break-words">{t('client.access')}</CardTitle>
+                <CardDescription className="break-words leading-relaxed">
                   {t('client.access.description')}
                 </CardDescription>
               </CardHeader>
@@ -144,12 +144,12 @@ const Login = () => {
                 </div>
                 <Separator />
                 <div className="text-center text-sm text-muted-foreground space-y-2">
-                  <p>{t('client.portal.features')}</p>
-                  <ul className="text-xs space-y-1">
-                    <li>• {t('view.inspection.results')}</li>
-                    <li>• {t('approve.services')}</li>
-                    <li>• {t('track.real.time')}</li>
-                    <li>• {t('approve.checkout')}</li>
+                  <p className="break-words">{t('client.portal.features')}</p>
+                  <ul className="text-xs space-y-1 text-left max-w-full">
+                    <li className="break-words">• {t('view.inspection.results')}</li>
+                    <li className="break-words">• {t('approve.services')}</li>
+                    <li className="break-words">• {t('track.real.time')}</li>
+                    <li className="break-words">• {t('approve.checkout')}</li>
                   </ul>
                 </div>
               </CardContent>
