@@ -92,10 +92,10 @@ const ClientPortal = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (clientId && !loading) {
+    if (clientId) {
       loadClientData();
     }
-  }, [clientId]); // Remove loading dependency to prevent loops
+  }, [clientId]);
 
   const loadClientData = async () => {
     try {
