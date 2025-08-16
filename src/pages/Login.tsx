@@ -104,7 +104,7 @@ const Login = () => {
                    >
                      <div className="text-left w-full pr-2">
                        <div className="font-medium text-base mb-2 line-clamp-1">{option.title}</div>
-                       <div className="text-xs text-foreground leading-tight line-clamp-3 [.hover\:bg-primary_&]:text-primary-foreground">
+                       <div className="text-xs font-medium leading-tight line-clamp-3 [.hover\:bg-primary_&]:text-primary-foreground">
                          {option.description}
                        </div>
                      </div>
