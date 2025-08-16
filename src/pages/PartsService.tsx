@@ -40,6 +40,21 @@ const PartsService = () => {
   const clientId = searchParams.get('clientId');
   const { t } = useLanguage();
   
+  // All hooks must be declared before any conditional returns
+  const [vehicleDetails, setVehicleDetails] = useState<VehicleDetails>({
+    customerName: "",
+    customerPhone: "",
+    customerEmail: "",
+    carModel: "",
+    carYear: "",
+    entryDate: new Date().toISOString().split('T')[0],
+    licensePlate: "",
+    mileage: "",
+  });
+  
+  const [generalMedia, setGeneralMedia] = useState<MediaItem[]>([]);
+  const [parts, setParts] = useState<PartEntry[]>([]);
+  
   const handleClientIdSubmit = () => {
     if (clientIdInput.trim()) {
       setSearchParams({ clientId: clientIdInput.trim() });
@@ -83,16 +98,6 @@ const PartsService = () => {
       </div>
     );
   }
-  const [vehicleDetails, setVehicleDetails] = useState<VehicleDetails>({
-    customerName: "",
-    customerPhone: "",
-    customerEmail: "",
-    carModel: "",
-    carYear: "",
-    entryDate: new Date().toISOString().split('T')[0],
-    licensePlate: "",
-    mileage: "",
-  });
   
   // Load client data when clientId is available
   useEffect(() => {
@@ -153,9 +158,6 @@ const PartsService = () => {
       });
     }
   };
-
-  const [generalMedia, setGeneralMedia] = useState<MediaItem[]>([]);
-  const [parts, setParts] = useState<PartEntry[]>([]);
 
   const addPart = () => {
     const newPart: PartEntry = {
