@@ -205,11 +205,14 @@ const CheckIn = () => {
   };
   const generateClientAndId = async () => {
     try {
-      // Create a client record and get the auto-generated client number
+      // First generate the client number
+      const generatedNumber = await generateClientNumber();
+      
+      // Create a client record with the generated number
       const { data: clientData, error: clientError } = await supabase
         .from('clients')
         .insert({
-          client_number: '', // Will be overridden by database
+          client_number: generatedNumber,
           customer_name: 'Pending',
           customer_phone: '',
           customer_email: ''
@@ -219,24 +222,15 @@ const CheckIn = () => {
 
       if (clientError) throw clientError;
 
-      // Generate the client number using our function
-      const generatedNumber = await generateClientNumber();
-      
-      // Update the client with the generated number
-      const { data: updatedClient, error: updateError } = await supabase
-        .from('clients')
-        .update({ client_number: generatedNumber })
-        .eq('id', clientData.id)
-        .select()
-        .single();
-
-      if (updateError) throw updateError;
-
       setClientId(clientData.id);
       setClientNumber(generatedNumber);
     } catch (error) {
       console.error('Error generating client ID:', error);
       toast.error('Failed to generate client ID');
+      // Retry once more in case of conflict
+      setTimeout(() => {
+        generateClientAndId();
+      }, 1000);
     }
   };
 
