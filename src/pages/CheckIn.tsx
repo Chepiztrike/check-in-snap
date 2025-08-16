@@ -94,6 +94,10 @@ const CheckIn = () => {
   const { t } = useLanguage();
   const stepsConfig = getStepsConfig(t);
   const [stepIndex, setStepIndex] = useState(0);
+  
+  // Client and check-in state
+  const [clientNumber, setClientNumber] = useState<string | null>(null);
+  const [clientId, setClientId] = useState<string | null>(null);
 
   // Vehicle fields
   const [customerName, setCustomerName] = useState("");
@@ -147,6 +151,11 @@ const CheckIn = () => {
   const currentStep = stepsConfig[stepIndex];
   const progress = Math.round((stepIndex + 1) / stepsConfig.length * 100);
   const containerRef = useRef<HTMLDivElement>(null);
+  // Generate client ID immediately when component loads
+  useEffect(() => {
+    generateClientAndId();
+  }, []);
+
   useEffect(() => {
     const el = containerRef.current;
     if (!el) return;
@@ -194,63 +203,40 @@ const CheckIn = () => {
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
   };
-  const handleFinish = async () => {
+  const generateClientAndId = async () => {
     try {
-      // First, create a client and get the auto-generated client number
+      // Create a client record and get the auto-generated client number
       const { data: clientData, error: clientError } = await supabase
         .from('clients')
         .insert({
-          client_number: '', // Will be overridden by the database function
-          customer_name: customerName,
-          customer_phone: customerPhone,
-          customer_email: customerEmail
+          client_number: '', // Will be overridden by database
+          customer_name: 'Pending',
+          customer_phone: '',
+          customer_email: ''
         })
         .select()
         .single();
 
       if (clientError) throw clientError;
 
-      // Update the client with the generated client number
+      // Generate the client number using our function
+      const generatedNumber = await generateClientNumber();
+      
+      // Update the client with the generated number
       const { data: updatedClient, error: updateError } = await supabase
         .from('clients')
-        .update({ 
-          client_number: await generateClientNumber() 
-        })
+        .update({ client_number: generatedNumber })
         .eq('id', clientData.id)
         .select()
         .single();
 
       if (updateError) throw updateError;
 
-      // Create the check-in record linked to the client
-      const { data: checkinData, error: checkinError } = await supabase
-        .from('checkins')
-        .insert({
-          client_id: clientData.id,
-          mechanic_id: '00000000-0000-0000-0000-000000000000', // Placeholder for now
-          vehicle_vin: vin,
-          plate: plate,
-          mileage: parseInt(mileage) || 0,
-          status: 'submitted'
-        })
-        .select()
-        .single();
-
-      if (checkinError) throw checkinError;
-
-      toast.success(`${t('checkin.completed')} ${t('client.id')}: ${updatedClient.client_number}`);
-      
-      // Show client tracking information
-      setTimeout(() => {
-        toast.success(`${t('client.tracking')}: ${window.location.origin}/client/${updatedClient.client_number}`, {
-          duration: 10000
-        });
-      }, 1000);
-
-      navigate("/");
+      setClientId(clientData.id);
+      setClientNumber(generatedNumber);
     } catch (error) {
-      console.error('Error creating client and check-in:', error);
-      toast.error('Failed to complete check-in');
+      console.error('Error generating client ID:', error);
+      toast.error('Failed to generate client ID');
     }
   };
 
@@ -259,6 +245,47 @@ const CheckIn = () => {
     if (error) throw error;
     return data;
   };
+
+  const handleFinish = async () => {
+    if (!clientId || !clientNumber) {
+      toast.error('Client ID not generated. Please try again.');
+      return;
+    }
+
+    try {
+      // Update the client with complete customer information
+      const { error: clientUpdateError } = await supabase
+        .from('clients')
+        .update({
+          customer_name: customerName,
+          customer_phone: customerPhone,
+          customer_email: customerEmail
+        })
+        .eq('id', clientId);
+
+      if (clientUpdateError) throw clientUpdateError;
+
+      // Create the check-in record
+      const { error: checkinError } = await supabase
+        .from('checkins')
+        .insert({
+          client_id: clientId,
+          mechanic_id: '00000000-0000-0000-0000-000000000000', // Placeholder
+          vehicle_vin: vin,
+          plate: plate,
+          mileage: parseInt(mileage) || 0,
+          status: 'submitted'
+        });
+
+      if (checkinError) throw checkinError;
+
+      // Navigate to completion screen
+      navigate(`/check-in-complete/${clientNumber}`);
+    } catch (error) {
+      console.error('Error completing check-in:', error);
+      toast.error('Failed to complete check-in');
+    }
+  };
   const stepTitle = stepsConfig[stepIndex].title;
   return <div className="min-h-screen bg-background">
       <Seo title="Check-In | Guided Car Checklist" description="Step-by-step car check-in with photos, videos, and notes." canonical="/check-in" />
@@ -266,6 +293,11 @@ const CheckIn = () => {
         <div className="container mx-auto flex items-center justify-between py-4">
           <h1 className="text-lg font-semibold">{t('car.checkin')}</h1>
           <div className="flex items-center gap-4">
+            {clientNumber && (
+              <div className="text-sm bg-primary/10 text-primary px-3 py-1 rounded-full border border-primary/20">
+                {t('client.id')}: <span className="font-mono font-semibold">{clientNumber}</span>
+              </div>
+            )}
             <div className="text-sm text-muted-foreground">{t('progress')}: {progress}%</div>
             <LanguageToggle />
           </div>

@@ -219,7 +219,27 @@ const translations = {
     'approved': 'Approved',
     'pending.approval': 'Pending Approval',
     'client.tracking': 'Client Tracking',
-    'track.service': 'Track Service'
+    'track.service': 'Track Service',
+    
+    // Check-in completion translations
+    'vehicle.successfully.registered': 'Your vehicle has been successfully registered',
+    'check.in.successful': 'Check-in Successful!',
+    'client.id.generated.instructions': 'Your client ID has been generated. Use this ID to track your service progress.',
+    'your.client.id': 'Your Client ID',
+    'tracking.url': 'Tracking URL',
+    'next.steps': 'Next Steps',
+    'save.client.id': 'Save Your Client ID',
+    'save.client.id.description': 'Write down or save this ID - you\'ll need it to track your service.',
+    'track.progress': 'Track Your Progress',
+    'track.progress.description': 'Use the client portal to see real-time updates on your vehicle.',
+    'approve.services': 'Approve Services',
+    'approve.services.description': 'You\'ll receive notifications when services need your approval.',
+    'view.service.status': 'View Service Status',
+    'back.to.home': 'Back to Home',
+    'client.id.copied': 'Client ID copied to clipboard',
+    'tracking.url.copied': 'Tracking URL copied to clipboard',
+    'copied': 'Copied!',
+    'copy': 'Copy'
   },
   es: {
     // Index page
@@ -431,7 +451,27 @@ const translations = {
     'approved': 'Aprobado',
     'pending.approval': 'Pendiente de Aprobación',
     'client.tracking': 'Seguimiento del Cliente',
-    'track.service': 'Rastrear Servicio'
+    'track.service': 'Rastrear Servicio',
+    
+    // Check-in completion translations
+    'vehicle.successfully.registered': 'Tu vehículo ha sido registrado exitosamente',
+    'check.in.successful': '¡Entrada Exitosa!',
+    'client.id.generated.instructions': 'Se ha generado tu ID de cliente. Usa este ID para rastrear el progreso de tu servicio.',
+    'your.client.id': 'Tu ID de Cliente',
+    'tracking.url': 'URL de Seguimiento',
+    'next.steps': 'Próximos Pasos',
+    'save.client.id': 'Guarda tu ID de Cliente',
+    'save.client.id.description': 'Anota o guarda este ID - lo necesitarás para rastrear tu servicio.',
+    'track.progress': 'Rastrea tu Progreso',
+    'track.progress.description': 'Usa el portal del cliente para ver actualizaciones en tiempo real de tu vehículo.',
+    'approve.services': 'Aprobar Servicios',
+    'approve.services.description': 'Recibirás notificaciones cuando los servicios necesiten tu aprobación.',
+    'view.service.status': 'Ver Estado del Servicio',
+    'back.to.home': 'Volver al Inicio',
+    'client.id.copied': 'ID de cliente copiado al portapapeles',
+    'tracking.url.copied': 'URL de seguimiento copiada al portapapeles',
+    'copied': '¡Copiado!',
+    'copy': 'Copiar'
   }
 };
 

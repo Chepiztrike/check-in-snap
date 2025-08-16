@@ -10,6 +10,7 @@ import CheckIn from "./pages/CheckIn";
 import PartsService from "./pages/PartsService";
 import CheckOut from "./pages/CheckOut";
 import ClientPortal from "./pages/ClientPortal";
+import CheckInComplete from "./pages/CheckInComplete";
 
 const queryClient = new QueryClient();
 
@@ -26,6 +27,7 @@ const App = () => (
           <Route path="/parts-service" element={<PartsService />} />
           <Route path="/check-out" element={<CheckOut />} />
           <Route path="/client/:clientId" element={<ClientPortal />} />
+          <Route path="/check-in-complete/:clientNumber" element={<CheckInComplete />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
