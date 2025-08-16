@@ -305,11 +305,26 @@ const CheckIn = () => {
             // Add media for this checklist item if any
             if (stepData.checklistMedia && stepData.checklistMedia[i]) {
               for (const media of stepData.checklistMedia[i]) {
-                mediaFiles.push({
-                  checkin_id: checkinId,
-                  file_path: media.path,
-                  media_type: media.file.type
-                });
+                if (media.file) {
+                  try {
+                    const fileName = `${checkinId}/${step.key}_${i}_${Date.now()}_${media.file.name}`;
+                    const { error: uploadError } = await supabase.storage
+                      .from('checkins')
+                      .upload(fileName, media.file);
+
+                    if (uploadError) {
+                      console.error('Error uploading media:', uploadError);
+                    } else {
+                      mediaFiles.push({
+                        checkin_id: checkinId,
+                        file_path: fileName,
+                        media_type: media.file.type
+                      });
+                    }
+                  } catch (error) {
+                    console.error('Error processing media file:', error);
+                  }
+                }
               }
             }
           }
@@ -318,11 +333,26 @@ const CheckIn = () => {
         // Add general media for this step
         if (stepData.media) {
           for (const media of stepData.media) {
-            mediaFiles.push({
-              checkin_id: checkinId,
-              file_path: media.path,
-              media_type: media.file.type
-            });
+            if (media.file) {
+              try {
+                const fileName = `${checkinId}/${step.key}_general_${Date.now()}_${media.file.name}`;
+                const { error: uploadError } = await supabase.storage
+                  .from('checkins')
+                  .upload(fileName, media.file);
+
+                if (uploadError) {
+                  console.error('Error uploading media:', uploadError);
+                } else {
+                  mediaFiles.push({
+                    checkin_id: checkinId,
+                    file_path: fileName,
+                    media_type: media.file.type
+                  });
+                }
+              } catch (error) {
+                console.error('Error processing media file:', error);
+              }
+            }
           }
         }
       }
