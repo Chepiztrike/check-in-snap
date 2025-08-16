@@ -109,7 +109,9 @@ const ClientPortal = () => {
         .from('clients')
         .select('*')
         .eq('client_number', clientId)
-        .maybeSingle();
+        .single();
+
+      console.log('Raw client response:', { clientData, clientError });
 
       if (clientError) {
         console.error('Client error:', clientError);
