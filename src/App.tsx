@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import Auth from "./pages/Auth";
+import Login from "./pages/Login";
 import CheckIn from "./pages/CheckIn";
 import PartsService from "./pages/PartsService";
 import CheckOut from "./pages/CheckOut";
@@ -23,6 +24,7 @@ const App = () => (
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/auth" element={<Auth />} />
+          <Route path="/login" element={<Login />} />
           <Route path="/check-in" element={<CheckIn />} />
           <Route path="/parts-service" element={<PartsService />} />
           <Route path="/check-out" element={<CheckOut />} />

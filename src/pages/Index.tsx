@@ -86,43 +86,31 @@ const Index = () => {
           </div>
         </section>
 
-        {/* Features Grid */}
+        {/* Access Portal */}
         <section className="container mx-auto py-16 px-4">
-          <div className="grid gap-8 md:grid-cols-3 max-w-6xl mx-auto">
-            {features.map((feature, index) => {
-              const Icon = feature.icon;
-              return (
-                <Card 
-                  key={index} 
-                  className="group relative overflow-hidden border-0 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-2 glass-effect"
+          <div className="max-w-2xl mx-auto text-center">
+            <Card className="border-2 border-primary/20 shadow-lg">
+              <CardContent className="p-8 space-y-6">
+                <div className="w-16 h-16 mx-auto rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center">
+                  <CheckCircle className="w-8 h-8 text-primary-foreground" />
+                </div>
+                <div className="space-y-3">
+                  <h3 className="text-2xl font-semibold text-foreground">
+                    {t('access.system')}
+                  </h3>
+                  <p className="text-muted-foreground leading-relaxed">
+                    {t('access.system.description')}
+                  </p>
+                </div>
+                <Button 
+                  onClick={() => navigate('/login')}
+                  className="w-full font-medium"
+                  size="lg"
                 >
-                  <CardContent className="p-8 text-center space-y-6">
-                    <div className="relative">
-                      <div className="w-16 h-16 mx-auto rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center glow">
-                        <Icon className="w-8 h-8 text-primary-foreground" />
-                      </div>
-                    </div>
-                    <div className="space-y-3">
-                      <h3 className="text-xl font-semibold text-foreground">
-                        {feature.title}
-                      </h3>
-                      <p className="text-muted-foreground leading-relaxed">
-                        {feature.description}
-                      </p>
-                    </div>
-                    <a href={feature.href} className="block">
-                      <Button 
-                        variant={feature.variant}
-                        className="w-full font-medium"
-                        size="lg"
-                      >
-                        {t('get.started')}
-                      </Button>
-                    </a>
-                  </CardContent>
-                </Card>
-              );
-            })}
+                  {t('access.portal')}
+                </Button>
+              </CardContent>
+            </Card>
           </div>
         </section>
 

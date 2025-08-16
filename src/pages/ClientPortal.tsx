@@ -297,7 +297,7 @@ const ClientPortal = () => {
           <div className="flex items-center gap-4">
             <Button variant="outline" onClick={() => navigate('/')} className="flex items-center gap-2">
               <Home className="h-4 w-4" />
-              {t('return.home')}
+              {t('home')}
             </Button>
             <LanguageToggle />
           </div>
