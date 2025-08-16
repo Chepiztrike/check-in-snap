@@ -82,15 +82,35 @@ const Auth = () => {
   const handleMechanicLogin = async () => {
     setLoading(true);
     try {
-      const { error } = await supabase.auth.signInWithPassword({
+      // First try to sign up the mechanic user if it doesn't exist
+      const { error: signUpError } = await supabase.auth.signUp({
         email: 'mechanic@autocheck.com',
         password: 'mechanic123',
+        options: {
+          emailRedirectTo: `${window.location.origin}/`,
+          data: {
+            name: 'Demo Mechanic'
+          }
+        }
       });
 
-      if (error) {
-        toast.error(error.message);
+      // If user already exists, try to sign in
+      if (signUpError && signUpError.message.includes('already registered')) {
+        const { error: signInError } = await supabase.auth.signInWithPassword({
+          email: 'mechanic@autocheck.com',
+          password: 'mechanic123',
+        });
+
+        if (signInError) {
+          toast.error(`Sign in failed: ${signInError.message}`);
+        } else {
+          toast.success(t('signed.in.demo'));
+          navigate('/check-in');
+        }
+      } else if (signUpError) {
+        toast.error(`Account creation failed: ${signUpError.message}`);
       } else {
-        toast.success(t('signed.in.demo'));
+        toast.success('Demo mechanic account created and signed in!');
         navigate('/check-in');
       }
     } catch (error) {
