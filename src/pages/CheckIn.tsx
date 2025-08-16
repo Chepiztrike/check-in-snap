@@ -11,6 +11,7 @@ import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 import { useLanguage } from "@/contexts/LanguageContext";
 import LanguageToggle from "@/components/LanguageToggle";
+import { supabase } from "@/integrations/supabase/client";
 interface StepData {
   notes?: string;
   media: MediaItem[];
@@ -193,18 +194,70 @@ const CheckIn = () => {
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
   };
-  const handleFinish = () => {
-    console.log("Check-in payload", {
-      vehicle: {
-        customerName,
-        plate,
-        vin,
-        mileage
-      },
-      steps: data
-    });
-    toast.success(t('checkin.completed'));
-    navigate("/");
+  const handleFinish = async () => {
+    try {
+      // First, create a client and get the auto-generated client number
+      const { data: clientData, error: clientError } = await supabase
+        .from('clients')
+        .insert({
+          client_number: '', // Will be overridden by the database function
+          customer_name: customerName,
+          customer_phone: customerPhone,
+          customer_email: customerEmail
+        })
+        .select()
+        .single();
+
+      if (clientError) throw clientError;
+
+      // Update the client with the generated client number
+      const { data: updatedClient, error: updateError } = await supabase
+        .from('clients')
+        .update({ 
+          client_number: await generateClientNumber() 
+        })
+        .eq('id', clientData.id)
+        .select()
+        .single();
+
+      if (updateError) throw updateError;
+
+      // Create the check-in record linked to the client
+      const { data: checkinData, error: checkinError } = await supabase
+        .from('checkins')
+        .insert({
+          client_id: clientData.id,
+          mechanic_id: '00000000-0000-0000-0000-000000000000', // Placeholder for now
+          vehicle_vin: vin,
+          plate: plate,
+          mileage: parseInt(mileage) || 0,
+          status: 'submitted'
+        })
+        .select()
+        .single();
+
+      if (checkinError) throw checkinError;
+
+      toast.success(`${t('checkin.completed')} ${t('client.id')}: ${updatedClient.client_number}`);
+      
+      // Show client tracking information
+      setTimeout(() => {
+        toast.success(`${t('client.tracking')}: ${window.location.origin}/client/${updatedClient.client_number}`, {
+          duration: 10000
+        });
+      }, 1000);
+
+      navigate("/");
+    } catch (error) {
+      console.error('Error creating client and check-in:', error);
+      toast.error('Failed to complete check-in');
+    }
+  };
+
+  const generateClientNumber = async (): Promise<string> => {
+    const { data, error } = await supabase.rpc('generate_client_number');
+    if (error) throw error;
+    return data;
   };
   const stepTitle = stepsConfig[stepIndex].title;
   return <div className="min-h-screen bg-background">

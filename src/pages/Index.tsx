@@ -1,13 +1,18 @@
 import hero from "@/assets/hero-garage.jpg";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
 import Seo from "@/components/Seo";
-import { CheckCircle, Wrench, Car } from "lucide-react";
+import { CheckCircle, Wrench, Car, Search } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import LanguageToggle from "@/components/LanguageToggle";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const Index = () => {
   const { t } = useLanguage();
+  const navigate = useNavigate();
+  const [clientId, setClientId] = useState("");
   
   const features = [
     {
@@ -32,6 +37,12 @@ const Index = () => {
       variant: "default" as const
     }
   ];
+
+  const handleTrackService = () => {
+    if (clientId.trim()) {
+      navigate(`/client/${clientId.trim()}`);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-secondary/30 to-muted/50">
@@ -112,6 +123,43 @@ const Index = () => {
                 </Card>
               );
             })}
+          </div>
+        </section>
+
+        {/* Client Tracking Section */}
+        <section className="container mx-auto py-16 px-4">
+          <div className="max-w-md mx-auto">
+            <Card className="border-2 border-accent/20 shadow-lg">
+              <CardContent className="p-8 text-center space-y-6">
+                <div className="w-16 h-16 mx-auto rounded-full bg-gradient-to-br from-accent to-primary flex items-center justify-center">
+                  <Search className="w-8 h-8 text-primary-foreground" />
+                </div>
+                <div className="space-y-3">
+                  <h3 className="text-xl font-semibold text-foreground">
+                    {t('client.tracking')}
+                  </h3>
+                  <p className="text-muted-foreground">
+                    {t('track.service.progress')}
+                  </p>
+                </div>
+                <div className="space-y-3">
+                  <Input
+                    placeholder={`${t('client.id')} (e.g., CLT-2024-0001)`}
+                    value={clientId}
+                    onChange={(e) => setClientId(e.target.value)}
+                    onKeyPress={(e) => e.key === 'Enter' && handleTrackService()}
+                  />
+                  <Button 
+                    onClick={handleTrackService}
+                    disabled={!clientId.trim()}
+                    className="w-full font-medium"
+                    size="lg"
+                  >
+                    {t('track.service')}
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
           </div>
         </section>
 
