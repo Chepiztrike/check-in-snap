@@ -380,6 +380,14 @@ const ClientPortal = () => {
                     <span className="text-muted-foreground">{t('mileage')}: </span>
                     <span className="font-medium">{checkin.mileage}</span>
                   </div>
+                  <div>
+                    <span className="text-muted-foreground">{t('car.model')}: </span>
+                    <span className="font-medium">{checkin.car_model || t('not.provided')}</span>
+                  </div>
+                  <div>
+                    <span className="text-muted-foreground">{t('car.year')}: </span>
+                    <span className="font-medium">{checkin.car_year || t('not.provided')}</span>
+                  </div>
                   <div className="col-span-2">
                     <span className="text-muted-foreground">{t('vin')}: </span>
                     <span className="font-medium font-mono text-xs">{checkin.vehicle_vin}</span>
@@ -881,6 +889,56 @@ const ClientPortal = () => {
                 {t('vehicle.ready.pickup')}
               </CardDescription>
             </CardHeader>
+          </Card>
+        )}
+
+        {/* Mechanic Workflow Section */}
+        {checkin && (
+          <Card className="mb-6">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Wrench className="h-5 w-5" />
+                {t('mechanic.workflow')}
+              </CardTitle>
+              <CardDescription>
+                {t('mechanic.next.steps')}
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <Button 
+                  variant="outline" 
+                  onClick={() => window.open(`/parts-service?clientId=${client?.client_number}`, '_blank')}
+                  className="h-auto p-4 justify-start"
+                >
+                  <div className="flex items-center gap-3">
+                    <Wrench className="h-5 w-5" />
+                    <div className="text-left">
+                      <div className="font-medium">{t('parts.service')}</div>
+                      <div className="text-sm text-muted-foreground">{t('parts.description')}</div>
+                    </div>
+                  </div>
+                </Button>
+                
+                <Button 
+                  variant="outline" 
+                  onClick={() => window.open(`/check-out?clientId=${client?.client_number}`, '_blank')}
+                  className="h-auto p-4 justify-start"
+                >
+                  <div className="flex items-center gap-3">
+                    <Wrench className="h-5 w-5" />
+                    <div className="text-left">
+                      <div className="font-medium">{t('vehicle.checkout')}</div>
+                      <div className="text-sm text-muted-foreground">{t('checkout.description')}</div>
+                    </div>
+                  </div>
+                </Button>
+              </div>
+              
+              <div className="text-xs text-muted-foreground bg-muted/30 p-3 rounded-lg">
+                {t('mechanic.workflow.note')}
+              </div>
+            </CardContent>
           </Card>
         )}
       </div>

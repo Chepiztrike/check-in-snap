@@ -263,6 +263,8 @@ const CheckIn = () => {
           mechanic_id: null, // No mechanic required for demo
           vehicle_vin: vin,
           plate: plate,
+          car_model: carModel,
+          car_year: carYear,
           mileage: parseInt(mileage) || 0,
           status: 'submitted'
         });

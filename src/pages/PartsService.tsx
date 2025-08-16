@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -12,6 +12,7 @@ import PartsItemUploader from "@/components/service/PartsItemUploader";
 import MediaUploader, { MediaItem } from "@/components/checkin/MediaUploader";
 import { useLanguage } from "@/contexts/LanguageContext";
 import LanguageToggle from "@/components/LanguageToggle";
+import { supabase } from "@/integrations/supabase/client";
 
 interface PartEntry {
   id: string;
@@ -34,9 +35,19 @@ interface VehicleDetails {
 }
 
 const PartsService = () => {
-  const [searchParams] = useSearchParams();
-  const clientId = searchParams.get('clientId');
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [clientId, setClientId] = useState("");
   const { t } = useLanguage();
+  
+  // Load client ID from URL or prompt user to enter it
+  useEffect(() => {
+    const urlClientId = searchParams.get('clientId');
+    if (urlClientId) {
+      setClientId(urlClientId);
+      loadClientData(urlClientId);
+    }
+  }, [searchParams]);
+
   const [vehicleDetails, setVehicleDetails] = useState<VehicleDetails>({
     customerName: "",
     customerPhone: "",
@@ -50,6 +61,67 @@ const PartsService = () => {
 
   const [generalMedia, setGeneralMedia] = useState<MediaItem[]>([]);
   const [parts, setParts] = useState<PartEntry[]>([]);
+  const [loading, setLoading] = useState(false);
+
+  const loadClientData = async (clientNumber: string) => {
+    if (!clientNumber) return;
+    
+    setLoading(true);
+    try {
+      // Load client info
+      const { data: clientData, error: clientError } = await supabase
+        .from('clients')
+        .select('*')
+        .eq('client_number', clientNumber)
+        .maybeSingle();
+
+      if (clientError) throw clientError;
+      if (!clientData) {
+        toast({
+          title: "Client not found",
+          description: "Please check the client ID and try again.",
+          variant: "destructive"
+        });
+        return;
+      }
+
+      // Load checkin data for vehicle details
+      const { data: checkinData, error: checkinError } = await supabase
+        .from('checkins')
+        .select('*')
+        .eq('client_id', clientData.id)
+        .maybeSingle();
+
+      if (checkinData) {
+        setVehicleDetails({
+          customerName: clientData.customer_name,
+          customerPhone: clientData.customer_phone,
+          customerEmail: clientData.customer_email,
+          carModel: checkinData.car_model || "",
+          carYear: checkinData.car_year || "",
+          entryDate: new Date().toISOString().split('T')[0],
+          licensePlate: checkinData.plate || "",
+          mileage: checkinData.mileage?.toString() || "",
+        });
+      }
+    } catch (error) {
+      console.error('Error loading client data:', error);
+      toast({
+        title: "Error loading data",
+        description: "Failed to load client information.",
+        variant: "destructive"
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleClientIdSubmit = () => {
+    if (clientId.trim()) {
+      setSearchParams({ clientId: clientId.trim() });
+      loadClientData(clientId.trim());
+    }
+  };
 
   const addPart = () => {
     const newPart: PartEntry = {
@@ -121,7 +193,7 @@ const PartsService = () => {
           <h1 className="text-2xl font-semibold">{t('parts.service.documentation')}</h1>
         </div>
         <div className="flex items-center gap-4">
-          <Button onClick={handleExport} className="gap-2">
+          <Button onClick={handleExport} className="gap-2" disabled={!clientId}>
             <Download className="h-4 w-4" />
             {t('export.data')}
           </Button>
@@ -130,6 +202,36 @@ const PartsService = () => {
       </header>
 
       <main className="container mx-auto space-y-8 pb-8">
+        {!searchParams.get('clientId') && (
+          <Card>
+            <CardHeader>
+              <CardTitle>Enter Client ID</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="flex gap-4">
+                <Input
+                  placeholder="Enter client ID (e.g., CLT-2025-0001)"
+                  value={clientId}
+                  onChange={(e) => setClientId(e.target.value)}
+                  onKeyPress={(e) => e.key === 'Enter' && handleClientIdSubmit()}
+                />
+                <Button onClick={handleClientIdSubmit} disabled={!clientId.trim()}>
+                  Load Client
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {searchParams.get('clientId') && (
+          <>
+            {loading && (
+              <Card>
+                <CardContent className="py-8">
+                  <div className="text-center">Loading client data...</div>
+                </CardContent>
+              </Card>
+            )}
         {/* Vehicle Details */}
         <Card>
           <CardHeader>
@@ -144,6 +246,7 @@ const PartsService = () => {
                   value={vehicleDetails.customerName}
                   onChange={(e) => setVehicleDetails({...vehicleDetails, customerName: e.target.value})}
                   placeholder={t('enter.customer.name')}
+                  disabled={loading}
                 />
               </div>
               <div>
@@ -153,6 +256,7 @@ const PartsService = () => {
                   value={vehicleDetails.customerPhone}
                   onChange={(e) => setVehicleDetails({...vehicleDetails, customerPhone: e.target.value})}
                   placeholder={t('enter.phone.number')}
+                  disabled={loading}
                 />
               </div>
               <div>
@@ -163,6 +267,7 @@ const PartsService = () => {
                   value={vehicleDetails.customerEmail}
                   onChange={(e) => setVehicleDetails({...vehicleDetails, customerEmail: e.target.value})}
                   placeholder={t('enter.email.address')}
+                  disabled={loading}
                 />
               </div>
               <div>
@@ -172,6 +277,7 @@ const PartsService = () => {
                   value={vehicleDetails.carModel}
                   onChange={(e) => setVehicleDetails({...vehicleDetails, carModel: e.target.value})}
                   placeholder={t('enter.car.model')}
+                  disabled={loading}
                 />
               </div>
               <div>
@@ -181,6 +287,7 @@ const PartsService = () => {
                   value={vehicleDetails.carYear}
                   onChange={(e) => setVehicleDetails({...vehicleDetails, carYear: e.target.value})}
                   placeholder={t('enter.year')}
+                  disabled={loading}
                 />
               </div>
               <div>
@@ -190,6 +297,7 @@ const PartsService = () => {
                   type="date"
                   value={vehicleDetails.entryDate}
                   onChange={(e) => setVehicleDetails({...vehicleDetails, entryDate: e.target.value})}
+                  disabled={loading}
                 />
               </div>
               <div>
@@ -199,6 +307,7 @@ const PartsService = () => {
                   value={vehicleDetails.licensePlate}
                   onChange={(e) => setVehicleDetails({...vehicleDetails, licensePlate: e.target.value})}
                   placeholder={t('enter.license.plate')}
+                  disabled={loading}
                 />
               </div>
               <div>
@@ -208,6 +317,7 @@ const PartsService = () => {
                   value={vehicleDetails.mileage}
                   onChange={(e) => setVehicleDetails({...vehicleDetails, mileage: e.target.value})}
                   placeholder={t('current.mileage')}
+                  disabled={loading}
                 />
               </div>
             </div>
@@ -256,6 +366,8 @@ const PartsService = () => {
             )}
           </CardContent>
         </Card>
+        </>
+        )}
       </main>
     </div>
   );

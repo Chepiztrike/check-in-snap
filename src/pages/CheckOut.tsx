@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -11,6 +11,7 @@ import CheckoutItemUploader from "@/components/checkout/CheckoutItemUploader";
 import MediaUploader, { MediaItem } from "@/components/checkin/MediaUploader";
 import { useLanguage } from "@/contexts/LanguageContext";
 import LanguageToggle from "@/components/LanguageToggle";
+import { supabase } from "@/integrations/supabase/client";
 
 interface CheckoutItemData {
   media: MediaItem[];
@@ -44,10 +45,20 @@ const getCheckoutItems = (t: (key: string) => string) => [
 ];
 
 const CheckOut = () => {
-  const [searchParams] = useSearchParams();
-  const clientId = searchParams.get('clientId');
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [clientId, setClientId] = useState("");
   const { t } = useLanguage();
   const checkoutItems = getCheckoutItems(t);
+  
+  // Load client ID from URL or prompt user to enter it
+  useEffect(() => {
+    const urlClientId = searchParams.get('clientId');
+    if (urlClientId) {
+      setClientId(urlClientId);
+      loadClientData(urlClientId);
+    }
+  }, [searchParams]);
+
   const [vehicleDetails, setVehicleDetails] = useState<VehicleDetails>({
     customerName: "",
     customerPhone: "",
@@ -61,6 +72,65 @@ const CheckOut = () => {
 
   const [generalMedia, setGeneralMedia] = useState<MediaItem[]>([]);
   const [checkoutData, setCheckoutData] = useState<Record<number, CheckoutItemData>>({});
+  const [loading, setLoading] = useState(false);
+
+  const loadClientData = async (clientNumber: string) => {
+    if (!clientNumber) return;
+    
+    setLoading(true);
+    try {
+      // Load client info
+      const { data: clientData, error: clientError } = await supabase
+        .from('clients')
+        .select('*')
+        .eq('client_number', clientNumber)
+        .maybeSingle();
+
+      if (clientError) throw clientError;
+      if (!clientData) {
+        toast({
+          title: "Client not found",
+          description: "Please check the client ID and try again.",
+        });
+        return;
+      }
+
+      // Load checkin data for vehicle details
+      const { data: checkinData, error: checkinError } = await supabase
+        .from('checkins')
+        .select('*')
+        .eq('client_id', clientData.id)
+        .maybeSingle();
+
+      if (checkinData) {
+        setVehicleDetails({
+          customerName: clientData.customer_name,
+          customerPhone: clientData.customer_phone,
+          customerEmail: clientData.customer_email,
+          carModel: checkinData.car_model || "",
+          carYear: checkinData.car_year || "",
+          checkoutDate: new Date().toISOString().split('T')[0],
+          licensePlate: checkinData.plate || "",
+          mileage: checkinData.mileage?.toString() || "",
+        });
+      }
+    } catch (error) {
+      console.error('Error loading client data:', error);
+      toast({
+        title: "Error loading data",
+        description: "Failed to load client information.",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleClientIdSubmit = () => {
+    if (clientId.trim()) {
+      setSearchParams({ clientId: clientId.trim() });
+      loadClientData(clientId.trim());
+    }
+  };
 
   const handleCheckoutDataChange = (index: number, field: keyof CheckoutItemData, value: any) => {
     setCheckoutData(prev => ({
@@ -126,7 +196,7 @@ const CheckOut = () => {
           <h1 className="text-2xl font-semibold">{t('vehicle.checkout.page')}</h1>
         </div>
         <div className="flex items-center gap-4">
-          <Button onClick={handleExport} className="gap-2">
+          <Button onClick={handleExport} className="gap-2" disabled={!clientId}>
             <Download className="h-4 w-4" />
             {t('export.data')}
           </Button>
@@ -135,6 +205,37 @@ const CheckOut = () => {
       </header>
 
       <main className="container mx-auto space-y-8 pb-8">
+        {!searchParams.get('clientId') && (
+          <Card>
+            <CardHeader>
+              <CardTitle>Enter Client ID</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="flex gap-4">
+                <Input
+                  placeholder="Enter client ID (e.g., CLT-2025-0001)"
+                  value={clientId}
+                  onChange={(e) => setClientId(e.target.value)}
+                  onKeyPress={(e) => e.key === 'Enter' && handleClientIdSubmit()}
+                />
+                <Button onClick={handleClientIdSubmit} disabled={!clientId.trim()}>
+                  Load Client
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {searchParams.get('clientId') && (
+          <>
+            {loading && (
+              <Card>
+                <CardContent className="py-8">
+                  <div className="text-center">Loading client data...</div>
+                </CardContent>
+              </Card>
+            )}
+
         {/* Vehicle Details */}
         <Card>
           <CardHeader>
@@ -150,6 +251,7 @@ const CheckOut = () => {
                   onChange={(e) => setVehicleDetails({...vehicleDetails, customerName: e.target.value})}
                   placeholder={t('enter.customer.name')}
                   className="text-sm"
+                  disabled={loading}
                 />
               </div>
               <div>
@@ -159,6 +261,7 @@ const CheckOut = () => {
                   value={vehicleDetails.customerPhone}
                   onChange={(e) => setVehicleDetails({...vehicleDetails, customerPhone: e.target.value})}
                   placeholder={t('enter.phone.number')}
+                  disabled={loading}
                 />
               </div>
               <div>
@@ -169,6 +272,7 @@ const CheckOut = () => {
                   value={vehicleDetails.customerEmail}
                   onChange={(e) => setVehicleDetails({...vehicleDetails, customerEmail: e.target.value})}
                   placeholder={t('enter.email.address')}
+                  disabled={loading}
                 />
               </div>
               <div>
@@ -178,6 +282,7 @@ const CheckOut = () => {
                   value={vehicleDetails.carModel}
                   onChange={(e) => setVehicleDetails({...vehicleDetails, carModel: e.target.value})}
                   placeholder={t('enter.car.model')}
+                  disabled={loading}
                 />
               </div>
               <div>
@@ -187,6 +292,7 @@ const CheckOut = () => {
                   value={vehicleDetails.carYear}
                   onChange={(e) => setVehicleDetails({...vehicleDetails, carYear: e.target.value})}
                   placeholder={t('enter.year')}
+                  disabled={loading}
                 />
               </div>
               <div>
@@ -196,6 +302,7 @@ const CheckOut = () => {
                   type="date"
                   value={vehicleDetails.checkoutDate}
                   onChange={(e) => setVehicleDetails({...vehicleDetails, checkoutDate: e.target.value})}
+                  disabled={loading}
                 />
               </div>
               <div>
@@ -205,6 +312,7 @@ const CheckOut = () => {
                   value={vehicleDetails.licensePlate}
                   onChange={(e) => setVehicleDetails({...vehicleDetails, licensePlate: e.target.value})}
                   placeholder={t('enter.license.plate')}
+                  disabled={loading}
                 />
               </div>
               <div>
@@ -214,6 +322,7 @@ const CheckOut = () => {
                   value={vehicleDetails.mileage}
                   onChange={(e) => setVehicleDetails({...vehicleDetails, mileage: e.target.value})}
                   placeholder={t('enter.final.mileage')}
+                  disabled={loading}
                 />
               </div>
             </div>
@@ -265,6 +374,8 @@ const CheckOut = () => {
             ))}
           </CardContent>
         </Card>
+        </>
+        )}
       </main>
     </div>
   );
