@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useSearchParams, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -263,12 +263,12 @@ const PartsService = () => {
       
       <header className="container mx-auto flex items-center justify-between py-6">
         <div className="flex items-center gap-4">
-          <a href="/">
+          <Link to="/">
             <Button variant="ghost" size="sm">
               <ArrowLeft className="h-4 w-4 mr-2" />
               {t('back')}
             </Button>
-          </a>
+          </Link>
           <h1 className="text-2xl font-semibold">{t('parts.service.documentation')}</h1>
         </div>
         <div className="flex items-center gap-4">
