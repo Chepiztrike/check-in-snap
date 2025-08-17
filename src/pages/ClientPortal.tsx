@@ -678,43 +678,6 @@ const ClientPortal = () => {
           </Card>
         )}
 
-        {/* Mechanic Actions - Only shown after checkin is approved */}
-        {checkin?.checkin_approved && !checkin?.checkout_approved && (
-          <Card className="mb-6 border-blue-200 bg-blue-50">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-blue-700">
-                <Wrench className="h-5 w-5" />
-                {t('mechanic.workflow')}
-              </CardTitle>
-              <CardDescription className="text-blue-600">
-                {t('mechanic.next.steps')}
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                <Button 
-                  variant="outline"
-                  onClick={() => window.open(`/parts-service?clientId=${client?.client_number}`, '_blank')}
-                  className="flex items-center gap-2 border-blue-200 text-blue-700 hover:bg-blue-100"
-                >
-                  <Wrench className="h-4 w-4" />
-                  {t('parts.service')}
-                </Button>
-                <Button 
-                  variant="outline"
-                  onClick={() => window.open(`/check-out?clientId=${client?.client_number}`, '_blank')}
-                  className="flex items-center gap-2 border-blue-200 text-blue-700 hover:bg-blue-100"
-                >
-                  <Car className="h-4 w-4" />
-                  {t('vehicle.checkout')}
-                </Button>
-              </div>
-              <p className="text-xs text-blue-600">
-                {t('mechanic.workflow.note')}
-              </p>
-            </CardContent>
-          </Card>
-        )}
 
         {/* Parts & Service Information */}
         {partsServiceSession && (
