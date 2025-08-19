@@ -14,6 +14,7 @@ import PartsService from "./pages/PartsService";
 import CheckOut from "./pages/CheckOut";
 import ClientPortal from "./pages/ClientPortal";
 import CheckInComplete from "./pages/CheckInComplete";
+import AuthConfirm from "./pages/AuthConfirm";
 
 const queryClient = new QueryClient();
 
@@ -27,16 +28,13 @@ const App = () => (
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/auth" element={<Auth />} />
+            <Route path="/auth/confirm" element={<AuthConfirm />} />
             <Route path="/login" element={
               <ProtectedRoute>
                 <Login />
               </ProtectedRoute>
             } />
-            <Route path="/check-in" element={
-              <ProtectedRoute>
-                <CheckIn />
-              </ProtectedRoute>
-            } />
+            <Route path="/check-in" element={<CheckIn />} />
             <Route path="/parts-service" element={
               <ProtectedRoute>
                 <PartsService />
