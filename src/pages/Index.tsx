@@ -84,15 +84,15 @@ const Index = () => {
         {/* Hero Section */}
         <section className="relative overflow-hidden">
           <div className="container relative z-10 mx-auto py-20">
-            <div className="text-center space-y-8 max-w-4xl mx-auto">
-              <div className="bg-gradient-to-br from-primary to-accent p-16 rounded-2xl shadow-2xl">
-                <h2 className="text-5xl md:text-6xl font-bold leading-tight text-white">
+            <div className="text-center space-y-8 max-w-4xl mx-auto px-4">
+              <div className="bg-gradient-to-br from-primary to-accent p-6 sm:p-12 md:p-16 rounded-2xl shadow-2xl">
+                <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold leading-tight text-white">
                   {t('streamlined.car.service')}
-                  <span className="block text-4xl md:text-5xl mt-2 font-semibold">
+                  <span className="block text-2xl sm:text-3xl md:text-4xl lg:text-5xl mt-2 font-semibold">
                     {t('every.time')}
                   </span>
                 </h2>
-                <p className="text-xl text-white/90 max-w-2xl mx-auto leading-relaxed mt-6">
+                <p className="text-base sm:text-lg md:text-xl text-white/90 max-w-2xl mx-auto leading-relaxed mt-4 sm:mt-6 px-2">
                   {t('professional.vehicle.description')}
                 </p>
               </div>
