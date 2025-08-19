@@ -1,41 +1,59 @@
-import { useState } from "react";
-import Seo from "@/components/Seo";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import React, { useState, useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Button } from "@/components/ui/button";
-import { useNavigate } from "react-router-dom";
-import { toast } from "sonner";
-import { useLanguage } from "@/contexts/LanguageContext";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Seo } from "@/components/Seo";
 import LanguageToggle from "@/components/LanguageToggle";
+import { useAuth } from "@/contexts/AuthContext";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 const Auth = () => {
-  const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { signIn, signUp, user } = useAuth();
   const { t } = useLanguage();
 
-  async function handleSignIn(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-    try {
-      setLoading(true);
-      await new Promise((r) => setTimeout(r, 600));
-      toast.success(t('signed.in.demo'));
-      navigate("/check-in");
-    } finally {
-      setLoading(false);
+  // Redirect if already authenticated
+  useEffect(() => {
+    if (user) {
+      const from = location.state?.from?.pathname || "/login";
+      navigate(from, { replace: true });
     }
-  }
+  }, [user, navigate, location]);
 
-  async function handleSignUp(e: React.FormEvent<HTMLFormElement>) {
+  const handleSignIn = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    try {
-      setLoading(true);
-      await new Promise((r) => setTimeout(r, 600));
-      toast.success(t('account.created.demo'));
-    } finally {
-      setLoading(false);
+    setLoading(true);
+    
+    const formData = new FormData(e.currentTarget);
+    const email = formData.get('email') as string;
+    const password = formData.get('password') as string;
+    
+    const { error } = await signIn(email, password);
+    
+    if (!error) {
+      const from = location.state?.from?.pathname || "/login";
+      navigate(from, { replace: true });
     }
-  }
+    
+    setLoading(false);
+  };
+
+  const handleSignUp = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setLoading(true);
+    
+    const formData = new FormData(e.currentTarget);
+    const email = formData.get('email') as string;
+    const password = formData.get('password') as string;
+    
+    await signUp(email, password);
+    setLoading(false);
+  };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background p-6">
@@ -58,11 +76,25 @@ const Auth = () => {
             <form onSubmit={handleSignIn} className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="email">{t('email')}</Label>
-                <Input id="email" name="email" type="email" required autoComplete="email" />
+                <Input 
+                  id="email" 
+                  name="email" 
+                  type="email" 
+                  required 
+                  autoComplete="email"
+                  placeholder="Enter your email"
+                />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="password">{t('password')}</Label>
-                <Input id="password" name="password" type="password" required autoComplete="current-password" />
+                <Input 
+                  id="password" 
+                  name="password" 
+                  type="password" 
+                  required 
+                  autoComplete="current-password"
+                  placeholder="Enter your password"
+                />
               </div>
               <Button type="submit" className="w-full" disabled={loading} variant="default">
                 {loading ? t('please.wait') : t('sign.in')}
@@ -73,11 +105,26 @@ const Auth = () => {
             <form onSubmit={handleSignUp} className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="email-su">{t('email')}</Label>
-                <Input id="email-su" name="email" type="email" required autoComplete="email" />
+                <Input 
+                  id="email-su" 
+                  name="email" 
+                  type="email" 
+                  required 
+                  autoComplete="email"
+                  placeholder="Enter your email"
+                />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="password-su">{t('password')}</Label>
-                <Input id="password-su" name="password" type="password" required autoComplete="new-password" />
+                <Input 
+                  id="password-su" 
+                  name="password" 
+                  type="password" 
+                  required 
+                  autoComplete="new-password"
+                  minLength={6}
+                  placeholder="Create a password (min 6 characters)"
+                />
               </div>
               <Button type="submit" className="w-full" disabled={loading} variant="secondary">
                 {loading ? t('please.wait') : t('create.account')}

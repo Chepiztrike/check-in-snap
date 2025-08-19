@@ -3,15 +3,17 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import Seo from "@/components/Seo";
-import { CheckCircle, Wrench, Car, Search } from "lucide-react";
+import { CheckCircle, Wrench, Car, Search, LogOut } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import LanguageToggle from "@/components/LanguageToggle";
+import { useAuth } from "@/contexts/AuthContext";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 const Index = () => {
   const { t } = useLanguage();
   const navigate = useNavigate();
+  const { user, signOut } = useAuth();
   const [clientId, setClientId] = useState("");
   
   const features = [
@@ -59,9 +61,21 @@ const Index = () => {
         </h1>
         <div className="flex items-center gap-4">
           <LanguageToggle />
-          <a href="/auth" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
-            {t('sign.in')}
-          </a>
+          {user ? (
+            <Button
+              onClick={signOut}
+              variant="outline"
+              size="sm"
+              className="text-sm"
+            >
+              <LogOut className="h-4 w-4 mr-2" />
+              Sign Out
+            </Button>
+          ) : (
+            <a href="/auth" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+              {t('sign.in')}
+            </a>
+          )}
         </div>
       </header>
 
@@ -103,11 +117,11 @@ const Index = () => {
                   </p>
                 </div>
                 <Button 
-                  onClick={() => navigate('/login')}
+                  onClick={() => navigate(user ? '/login' : '/auth')}
                   className="w-full font-medium"
                   size="lg"
                 >
-                  {t('access.portal')}
+                  {user ? t('access.portal') : t('sign.in')}
                 </Button>
               </CardContent>
             </Card>
