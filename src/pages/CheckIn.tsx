@@ -305,11 +305,14 @@ const CheckIn = () => {
             // Add media for this checklist item if any
             if (stepData.checklistMedia && stepData.checklistMedia[i]) {
               for (const media of stepData.checklistMedia[i]) {
-                mediaFiles.push({
-                  checkin_id: checkinId,
-                  file_path: media.path,
-                  media_type: media.file.type
-                });
+                // Only add media if it has a valid path
+                if (media.path && media.file) {
+                  mediaFiles.push({
+                    checkin_id: checkinId,
+                    file_path: media.path,
+                    media_type: media.file.type
+                  });
+                }
               }
             }
           }
@@ -318,11 +321,14 @@ const CheckIn = () => {
         // Add general media for this step
         if (stepData.media) {
           for (const media of stepData.media) {
-            mediaFiles.push({
-              checkin_id: checkinId,
-              file_path: media.path,
-              media_type: media.file.type
-            });
+            // Only add media if it has a valid path
+            if (media.path && media.file) {
+              mediaFiles.push({
+                checkin_id: checkinId,
+                file_path: media.path,
+                media_type: media.file.type
+              });
+            }
           }
         }
       }
