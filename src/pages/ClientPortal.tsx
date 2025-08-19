@@ -591,90 +591,102 @@ const ClientPortal = () => {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="space-y-4">
-                {checkinItems.map((item) => {
-                  const itemMedia = checkinMedia.filter(m => m.checkin_id === item.checkin_id);
-                  const needsService = item.result === 'service_needed' || item.service_needed;
-                  const isPassed = !needsService;
-                  
-                  return (
-                    <div key={item.id} className={`border rounded-lg p-4 ${needsService ? 'border-amber-200 bg-amber-50' : 'border-green-200 bg-green-50'}`}>
-                      <div className="flex justify-between items-start mb-2">
-                        <div className="flex items-center gap-2">
-                          {isPassed ? (
-                            <CheckCircle className="h-5 w-5 text-green-600" />
-                          ) : (
-                            <AlertCircle className="h-5 w-5 text-amber-600" />
-                          )}
-                          <h4 className="font-medium">{getItemName(item.item_key)}</h4>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          {needsService ? (
-                            <Badge variant="destructive" className="flex items-center gap-1">
-                              <Wrench className="h-3 w-3" />
-                              {t('service.required')}
-                            </Badge>
-                          ) : (
-                            <Badge variant="default" className="flex items-center gap-1 bg-green-600">
-                              <CheckCircle className="h-3 w-3" />
-                              {t('inspection.passed')}
-                            </Badge>
-                          )}
-                          {itemMedia.length > 0 && (
-                            <Badge variant="secondary" className="flex items-center gap-1">
-                              {getMediaIcon(itemMedia[0].media_type)}
-                              {itemMedia.length} {itemMedia.length === 1 ? t('file') : t('files')}
-                            </Badge>
-                          )}
-                        </div>
-                      </div>
-                      
-                      {item.notes && (
-                        <div className={`p-3 rounded mb-3 ${needsService ? 'bg-amber-100' : 'bg-green-100'}`}>
-                          <p className="text-sm font-medium mb-1">{t('inspection.notes')}:</p>
-                          <p className="text-sm">{item.notes}</p>
-                        </div>
-                      )}
-                      
-                      {needsService && (
-                        <div className="mb-3 p-3 bg-amber-100 rounded border border-amber-200">
-                          <p className="text-sm font-medium text-amber-800 mb-1">
-                            {t('action.required')}:
-                          </p>
-                          <p className="text-sm text-amber-700">
-                            {t('service.recommendation.for')} {getItemName(item.item_key).toLowerCase()}
-                          </p>
-                        </div>
-                      )}
-                      
-                      {itemMedia.length > 0 && (
-                        <div className="mt-3">
-                          <p className="text-sm font-medium mb-2">{t('inspection.evidence')}:</p>
-                          <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-                            {itemMedia.map((media) => (
-                              <div key={media.id} className="relative group">
-                                {media.media_type.startsWith('image/') ? (
-                                  <img
-                                    src={`${SUPABASE_URL}/storage/v1/object/public/checkins/${media.file_path}`}
-                                    alt="Inspection media"
-                                    className="w-full h-20 object-cover rounded border cursor-pointer hover:opacity-80"
-                                    onClick={() => window.open(`${SUPABASE_URL}/storage/v1/object/public/checkins/${media.file_path}`, '_blank')}
-                                  />
+              <Accordion type="single" collapsible>
+                <AccordionItem value="inspection-details" className="border rounded-lg">
+                  <AccordionTrigger className="px-4 py-3 hover:no-underline">
+                    <div className="flex items-center gap-2">
+                      <span className="font-medium">{t('detailed.inspection.findings')}</span>
+                      <Badge variant="secondary">{checkinItems.length} {t('items')}</Badge>
+                    </div>
+                  </AccordionTrigger>
+                  <AccordionContent className="px-4 pb-4">
+                    <div className="space-y-4">
+                      {checkinItems.map((item) => {
+                        const itemMedia = checkinMedia.filter(m => m.checkin_id === item.checkin_id);
+                        const needsService = item.result === 'service_needed' || item.service_needed;
+                        const isPassed = !needsService;
+                        
+                        return (
+                          <div key={item.id} className={`border rounded-lg p-4 ${needsService ? 'border-amber-200 bg-amber-50' : 'border-green-200 bg-green-50'}`}>
+                            <div className="flex justify-between items-start mb-2">
+                              <div className="flex items-center gap-2">
+                                {isPassed ? (
+                                  <CheckCircle className="h-5 w-5 text-green-600" />
                                 ) : (
-                                  <div className="w-full h-20 bg-muted rounded border flex items-center justify-center cursor-pointer hover:bg-muted/80"
-                                       onClick={() => window.open(`${SUPABASE_URL}/storage/v1/object/public/checkins/${media.file_path}`, '_blank')}>
-                                    {getMediaIcon(media.media_type)}
-                                  </div>
+                                  <AlertCircle className="h-5 w-5 text-amber-600" />
+                                )}
+                                <h4 className="font-medium">{getItemName(item.item_key)}</h4>
+                              </div>
+                              <div className="flex items-center gap-2">
+                                {needsService ? (
+                                  <Badge variant="destructive" className="flex items-center gap-1">
+                                    <Wrench className="h-3 w-3" />
+                                    {t('service.required')}
+                                  </Badge>
+                                ) : (
+                                  <Badge variant="default" className="flex items-center gap-1 bg-green-600">
+                                    <CheckCircle className="h-3 w-3" />
+                                    {t('inspection.passed')}
+                                  </Badge>
+                                )}
+                                {itemMedia.length > 0 && (
+                                  <Badge variant="secondary" className="flex items-center gap-1">
+                                    {getMediaIcon(itemMedia[0].media_type)}
+                                    {itemMedia.length} {itemMedia.length === 1 ? t('file') : t('files')}
+                                  </Badge>
                                 )}
                               </div>
-                            ))}
+                            </div>
+                            
+                            {item.notes && (
+                              <div className={`p-3 rounded mb-3 ${needsService ? 'bg-amber-100' : 'bg-green-100'}`}>
+                                <p className="text-sm font-medium mb-1">{t('inspection.notes')}:</p>
+                                <p className="text-sm">{item.notes}</p>
+                              </div>
+                            )}
+                            
+                            {needsService && (
+                              <div className="mb-3 p-3 bg-amber-100 rounded border border-amber-200">
+                                <p className="text-sm font-medium text-amber-800 mb-1">
+                                  {t('action.required')}:
+                                </p>
+                                <p className="text-sm text-amber-700">
+                                  {t('service.recommendation.for')} {getItemName(item.item_key).toLowerCase()}
+                                </p>
+                              </div>
+                            )}
+                            
+                            {itemMedia.length > 0 && (
+                              <div className="mt-3">
+                                <p className="text-sm font-medium mb-2">{t('inspection.evidence')}:</p>
+                                <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+                                  {itemMedia.map((media) => (
+                                    <div key={media.id} className="relative group">
+                                      {media.media_type.startsWith('image/') ? (
+                                        <img
+                                          src={`${SUPABASE_URL}/storage/v1/object/public/checkins/${media.file_path}`}
+                                          alt="Inspection media"
+                                          className="w-full h-20 object-cover rounded border cursor-pointer hover:opacity-80"
+                                          onClick={() => window.open(`${SUPABASE_URL}/storage/v1/object/public/checkins/${media.file_path}`, '_blank')}
+                                        />
+                                      ) : (
+                                        <div className="w-full h-20 bg-muted rounded border flex items-center justify-center cursor-pointer hover:bg-muted/80"
+                                             onClick={() => window.open(`${SUPABASE_URL}/storage/v1/object/public/checkins/${media.file_path}`, '_blank')}>
+                                          {getMediaIcon(media.media_type)}
+                                        </div>
+                                      )}
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+                            )}
                           </div>
-                        </div>
-                      )}
+                        );
+                      })}
                     </div>
-                  );
-                })}
-              </div>
+                  </AccordionContent>
+                </AccordionItem>
+              </Accordion>
             </CardContent>
           </Card>
         )}
