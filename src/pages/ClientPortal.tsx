@@ -7,6 +7,7 @@ import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/textarea";
 import { Progress } from "@/components/ui/progress";
 import { CheckCircle, Clock, AlertCircle, Car, Phone, Mail, Home, Image, Video, FileText, Wrench } from "lucide-react";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -820,119 +821,131 @@ const ClientPortal = () => {
             <CardContent className="space-y-6">
               
               {/* Vehicle Information Summary */}
-              <div className="bg-muted/50 rounded-lg p-4">
-                <h4 className="font-semibold mb-3 text-foreground">{t('vehicle.information')}</h4>
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                  <div className="space-y-1">
-                    <p className="text-sm font-medium text-muted-foreground">{t('license.plate')}</p>
-                    <p className="font-medium">{checkin.plate || t('not.provided')}</p>
-                  </div>
-                  <div className="space-y-1">
-                    <p className="text-sm font-medium text-muted-foreground">{t('mileage')}</p>
-                    <p className="font-medium">{checkin.mileage ? `${checkin.mileage} km` : t('not.provided')}</p>
-                  </div>
-                  <div className="space-y-1">
-                    <p className="text-sm font-medium text-muted-foreground">{t('car.model')}</p>
-                    <p className="font-medium">{checkin.car_model || t('not.provided')}</p>
-                  </div>
-                  <div className="space-y-1">
-                    <p className="text-sm font-medium text-muted-foreground">{t('year')}</p>
-                    <p className="font-medium">{checkin.car_year || t('not.provided')}</p>
-                  </div>
-                </div>
-                {checkin.vehicle_vin && (
-                  <div className="mt-3 pt-3 border-t">
-                    <p className="text-sm font-medium text-muted-foreground mb-1">{t('vehicle.vin')}</p>
-                    <p className="text-sm bg-background/60 p-2 rounded font-mono">{checkin.vehicle_vin}</p>
-                  </div>
-                )}
-                {checkin.client_notes && (
-                  <div className="mt-3 pt-3 border-t">
-                    <p className="text-sm font-medium text-muted-foreground mb-1">{t('client.notes')}</p>
-                    <p className="text-sm bg-background/60 p-2 rounded">{checkin.client_notes}</p>
-                  </div>
-                )}
-              </div>
+              <Accordion type="single" collapsible className="bg-muted/50 rounded-lg">
+                <AccordionItem value="vehicle-info" className="border-none">
+                  <AccordionTrigger className="px-4 py-3 hover:no-underline">
+                    <h4 className="font-semibold text-foreground">{t('vehicle.information')}</h4>
+                  </AccordionTrigger>
+                  <AccordionContent className="px-4 pb-4">
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                      <div className="space-y-1">
+                        <p className="text-sm font-medium text-muted-foreground">{t('license.plate')}</p>
+                        <p className="font-medium">{checkin.plate || t('not.provided')}</p>
+                      </div>
+                      <div className="space-y-1">
+                        <p className="text-sm font-medium text-muted-foreground">{t('mileage')}</p>
+                        <p className="font-medium">{checkin.mileage ? `${checkin.mileage} km` : t('not.provided')}</p>
+                      </div>
+                      <div className="space-y-1">
+                        <p className="text-sm font-medium text-muted-foreground">{t('car.model')}</p>
+                        <p className="font-medium">{checkin.car_model || t('not.provided')}</p>
+                      </div>
+                      <div className="space-y-1">
+                        <p className="text-sm font-medium text-muted-foreground">{t('year')}</p>
+                        <p className="font-medium">{checkin.car_year || t('not.provided')}</p>
+                      </div>
+                    </div>
+                    {checkin.vehicle_vin && (
+                      <div className="mt-3 pt-3 border-t">
+                        <p className="text-sm font-medium text-muted-foreground mb-1">{t('vehicle.vin')}</p>
+                        <p className="text-sm bg-background/60 p-2 rounded font-mono">{checkin.vehicle_vin}</p>
+                      </div>
+                    )}
+                    {checkin.client_notes && (
+                      <div className="mt-3 pt-3 border-t">
+                        <p className="text-sm font-medium text-muted-foreground mb-1">{t('client.notes')}</p>
+                        <p className="text-sm bg-background/60 p-2 rounded">{checkin.client_notes}</p>
+                      </div>
+                    )}
+                  </AccordionContent>
+                </AccordionItem>
+              </Accordion>
 
               {/* Complete Inspection Results */}
-              <div className="bg-muted/50 rounded-lg p-4">
-                <h4 className="font-semibold mb-3 text-foreground">{t('complete.inspection.results')}</h4>
-                <div className="space-y-3">
-                  {checkinItems.length === 0 ? (
-                    <p className="text-sm text-muted-foreground italic">{t('no.inspection.data')}</p>
-                  ) : (
-                    checkinItems.map((item) => {
-                      const itemMedia = checkinMedia.filter(m => m.checkin_id === item.checkin_id);
-                      const needsService = item.result === 'service_needed' || item.service_needed;
-                      
-                      return (
-                        <div key={item.id} className={`border rounded p-3 ${needsService ? 'border-amber-300 bg-amber-50/50' : 'border-green-300 bg-green-50/50'}`}>
-                          <div className="flex justify-between items-start mb-2">
-                            <div className="flex items-center gap-2 flex-1">
-                              {needsService ? (
-                                <AlertCircle className="h-4 w-4 text-amber-600 flex-shrink-0" />
-                              ) : (
-                                <CheckCircle className="h-4 w-4 text-green-600 flex-shrink-0" />
-                              )}
-                              <h5 className="font-medium text-sm">{getItemName(item.item_key)}</h5>
-                            </div>
-                            <div className="flex items-center gap-2">
-                              {needsService ? (
-                                <Badge variant="destructive" className="text-xs">
-                                  {t('service.required')}
-                                </Badge>
-                              ) : (
-                                <Badge variant="default" className="text-xs bg-green-600">
-                                  {t('passed')}
-                                </Badge>
-                              )}
-                              {itemMedia.length > 0 && (
-                                <Badge variant="secondary" className="text-xs">
-                                  {itemMedia.length} {itemMedia.length === 1 ? t('file') : t('files')}
-                                </Badge>
-                              )}
-                            </div>
-                          </div>
+              <Accordion type="single" collapsible className="bg-muted/50 rounded-lg">
+                <AccordionItem value="inspection-results" className="border-none">
+                  <AccordionTrigger className="px-4 py-3 hover:no-underline">
+                    <h4 className="font-semibold text-foreground">{t('complete.inspection.results')}</h4>
+                  </AccordionTrigger>
+                  <AccordionContent className="px-4 pb-4">
+                    <div className="space-y-3">
+                      {checkinItems.length === 0 ? (
+                        <p className="text-sm text-muted-foreground italic">{t('no.inspection.data')}</p>
+                      ) : (
+                        checkinItems.map((item) => {
+                          const itemMedia = checkinMedia.filter(m => m.checkin_id === item.checkin_id);
+                          const needsService = item.result === 'service_needed' || item.service_needed;
                           
-                          {item.notes && (
-                            <div className="mb-2 p-2 bg-background/60 rounded text-xs">
-                              <span className="font-medium">{t('notes')}: </span>
-                              <span>{item.notes}</span>
-                            </div>
-                          )}
-                          
-                          {itemMedia.length > 0 && (
-                            <div className="grid grid-cols-4 gap-1 mt-2">
-                              {itemMedia.slice(0, 4).map((media) => (
-                                <div key={media.id} className="relative">
-                                  {media.media_type.startsWith('image/') ? (
-                                    <img
-                                      src={`${SUPABASE_URL}/storage/v1/object/public/checkins/${media.file_path}`}
-                                      alt="Evidence"
-                                      className="w-full h-12 object-cover rounded cursor-pointer hover:opacity-80"
-                                      onClick={() => window.open(`${SUPABASE_URL}/storage/v1/object/public/checkins/${media.file_path}`, '_blank')}
-                                    />
+                          return (
+                            <div key={item.id} className={`border rounded p-3 ${needsService ? 'border-amber-300 bg-amber-50/50' : 'border-green-300 bg-green-50/50'}`}>
+                              <div className="flex justify-between items-start mb-2">
+                                <div className="flex items-center gap-2 flex-1">
+                                  {needsService ? (
+                                    <AlertCircle className="h-4 w-4 text-amber-600 flex-shrink-0" />
                                   ) : (
-                                    <div className="w-full h-12 bg-muted rounded flex items-center justify-center cursor-pointer hover:bg-muted/80"
-                                         onClick={() => window.open(`${SUPABASE_URL}/storage/v1/object/public/checkins/${media.file_path}`, '_blank')}>
-                                      {getMediaIcon(media.media_type)}
+                                    <CheckCircle className="h-4 w-4 text-green-600 flex-shrink-0" />
+                                  )}
+                                  <h5 className="font-medium text-sm">{getItemName(item.item_key)}</h5>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                  {needsService ? (
+                                    <Badge variant="destructive" className="text-xs">
+                                      {t('service.required')}
+                                    </Badge>
+                                  ) : (
+                                    <Badge variant="default" className="text-xs bg-green-600">
+                                      {t('passed')}
+                                    </Badge>
+                                  )}
+                                  {itemMedia.length > 0 && (
+                                    <Badge variant="secondary" className="text-xs">
+                                      {itemMedia.length} {itemMedia.length === 1 ? t('file') : t('files')}
+                                    </Badge>
+                                  )}
+                                </div>
+                              </div>
+                              
+                              {item.notes && (
+                                <div className="mb-2 p-2 bg-background/60 rounded text-xs">
+                                  <span className="font-medium">{t('notes')}: </span>
+                                  <span>{item.notes}</span>
+                                </div>
+                              )}
+                              
+                              {itemMedia.length > 0 && (
+                                <div className="grid grid-cols-4 gap-1 mt-2">
+                                  {itemMedia.slice(0, 4).map((media) => (
+                                    <div key={media.id} className="relative">
+                                      {media.media_type.startsWith('image/') ? (
+                                        <img
+                                          src={`${SUPABASE_URL}/storage/v1/object/public/checkins/${media.file_path}`}
+                                          alt="Evidence"
+                                          className="w-full h-12 object-cover rounded cursor-pointer hover:opacity-80"
+                                          onClick={() => window.open(`${SUPABASE_URL}/storage/v1/object/public/checkins/${media.file_path}`, '_blank')}
+                                        />
+                                      ) : (
+                                        <div className="w-full h-12 bg-muted rounded flex items-center justify-center cursor-pointer hover:bg-muted/80"
+                                             onClick={() => window.open(`${SUPABASE_URL}/storage/v1/object/public/checkins/${media.file_path}`, '_blank')}>
+                                          {getMediaIcon(media.media_type)}
+                                        </div>
+                                      )}
+                                    </div>
+                                  ))}
+                                  {itemMedia.length > 4 && (
+                                    <div className="w-full h-12 bg-muted rounded flex items-center justify-center text-xs font-medium">
+                                      +{itemMedia.length - 4}
                                     </div>
                                   )}
                                 </div>
-                              ))}
-                              {itemMedia.length > 4 && (
-                                <div className="w-full h-12 bg-muted rounded flex items-center justify-center text-xs font-medium">
-                                  +{itemMedia.length - 4}
-                                </div>
                               )}
                             </div>
-                          )}
-                        </div>
-                      );
-                    })
-                  )}
-                </div>
-              </div>
+                          );
+                        })
+                      )}
+                    </div>
+                  </AccordionContent>
+                </AccordionItem>
+              </Accordion>
 
               <Separator />
               
