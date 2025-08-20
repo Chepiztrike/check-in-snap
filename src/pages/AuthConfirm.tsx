@@ -25,7 +25,7 @@ const AuthConfirm = () => {
       setMessage('Your email has been confirmed successfully!');
       // Redirect to login page after confirmation
       setTimeout(() => {
-        navigate('/');
+        navigate('/login');
       }, 3000);
     } else {
       setStatus('success');
@@ -34,7 +34,7 @@ const AuthConfirm = () => {
   }, [searchParams, user, navigate]);
 
   const handleContinue = () => {
-    navigate(user ? '/' : '/auth');
+    navigate(user ? '/login' : '/auth');
   };
 
   return (

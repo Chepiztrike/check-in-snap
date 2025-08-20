@@ -15,8 +15,6 @@ import CheckOut from "./pages/CheckOut";
 import ClientPortal from "./pages/ClientPortal";
 import CheckInComplete from "./pages/CheckInComplete";
 import AuthConfirm from "./pages/AuthConfirm";
-import AuthCallback from "./pages/AuthCallback";
-import ResetPassword from "./pages/ResetPassword";
 
 const queryClient = new QueryClient();
 
@@ -31,18 +29,12 @@ const App = () => (
             <Route path="/" element={<Index />} />
             <Route path="/auth" element={<Auth />} />
             <Route path="/auth/confirm" element={<AuthConfirm />} />
-            <Route path="/auth/callback" element={<AuthCallback />} />
-            <Route path="/auth/reset-password" element={<ResetPassword />} />
             <Route path="/login" element={
               <ProtectedRoute>
                 <Login />
               </ProtectedRoute>
             } />
-            <Route path="/check-in" element={
-              <ProtectedRoute>
-                <CheckIn />
-              </ProtectedRoute>
-            } />
+            <Route path="/check-in" element={<CheckIn />} />
             <Route path="/parts-service" element={
               <ProtectedRoute>
                 <PartsService />
@@ -53,16 +45,8 @@ const App = () => (
                 <CheckOut />
               </ProtectedRoute>
             } />
-            <Route path="/client/:clientId" element={
-              <ProtectedRoute>
-                <ClientPortal />
-              </ProtectedRoute>
-            } />
-            <Route path="/check-in-complete/:clientNumber" element={
-              <ProtectedRoute>
-                <CheckInComplete />
-              </ProtectedRoute>
-            } />
+            <Route path="/client/:clientId" element={<ClientPortal />} />
+            <Route path="/check-in-complete/:clientNumber" element={<CheckInComplete />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
