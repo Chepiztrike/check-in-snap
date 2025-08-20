@@ -8,7 +8,8 @@ interface AuthContextType {
   session: Session | null;
   loading: boolean;
   signIn: (email: string, password: string) => Promise<{ error: any }>;
-  signUp: (email: string, password: string, skipEmailConfirmation?: boolean) => Promise<{ error: any }>;
+  signUp: (email: string, password: string) => Promise<{ error: any }>;
+  signInWithGoogle: () => Promise<{ error: any }>;
   signOut: () => Promise<void>;
   resetPassword: (email: string) => Promise<{ error: any }>;
   updatePassword: (password: string) => Promise<{ error: any }>;
@@ -68,22 +69,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return { error };
   };
 
-  const signUp = async (email: string, password: string, skipEmailConfirmation = false) => {
+  const signUp = async (email: string, password: string) => {
     setLoading(true);
     const redirectUrl = `${window.location.origin}/auth/confirm`;
     
-    const signUpOptions: any = {
+    const { error } = await supabase.auth.signUp({
       email,
       password,
-    };
-
-    if (!skipEmailConfirmation) {
-      signUpOptions.options = {
+      options: {
         emailRedirectTo: redirectUrl
-      };
-    }
-    
-    const { error } = await supabase.auth.signUp(signUpOptions);
+      }
+    });
     
     if (error) {
       // Handle specific error cases
@@ -101,17 +97,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         });
       }
     } else {
-      if (skipEmailConfirmation) {
-        toast({
-          title: "Account Created",
-          description: "Your account has been created successfully. You can now sign in.",
-        });
-      } else {
-        toast({
-          title: "Check your email",
-          description: "Please check your email for a confirmation link to complete registration. If you don't receive the email within a few minutes, check your spam folder.",
-        });
-      }
+      toast({
+        title: "Check your email",
+        description: "Please check your email for a confirmation link to complete registration. If you don't receive the email within a few minutes, check your spam folder.",
+      });
     }
     
     setLoading(false);
@@ -160,6 +149,25 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return { error };
   };
 
+  const signInWithGoogle = async () => {
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: { 
+        redirectTo: `${window.location.origin}/auth/callback`
+      }
+    });
+    
+    if (error) {
+      toast({
+        title: "Google Sign In Error",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
+    
+    return { error };
+  };
+
   const signOut = async () => {
     setLoading(true);
     await supabase.auth.signOut();
@@ -172,6 +180,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     loading,
     signIn,
     signUp,
+    signInWithGoogle,
     signOut,
     resetPassword,
     updatePassword,
