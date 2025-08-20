@@ -2,7 +2,9 @@ import { useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
-import { ImageIcon, VideoIcon, X } from "lucide-react";
+import { ImageIcon, VideoIcon, X, Camera, QrCode } from "lucide-react";
+import { Camera as CapacitorCamera, CameraResultType, CameraSource } from '@capacitor/camera';
+import { BarcodeScanner } from '@capacitor-community/barcode-scanner';
 
 export type MediaItem = {
   url: string;
@@ -40,6 +42,74 @@ const MediaUploader = ({
     onChange([...(value || []), ...items]);
   };
 
+  const handleCameraCapture = async () => {
+    try {
+      setUploading(true);
+      const image = await CapacitorCamera.getPhoto({
+        quality: 90,
+        allowEditing: false,
+        resultType: CameraResultType.Uri,
+        source: CameraSource.Camera,
+      });
+
+      if (image.webPath) {
+        // Convert to blob and create file
+        const response = await fetch(image.webPath);
+        const blob = await response.blob();
+        const file = new File([blob], `camera-${Date.now()}.jpg`, { type: 'image/jpeg' });
+        
+        const mediaItem: MediaItem = {
+          file,
+          type: "image",
+          url: URL.createObjectURL(file),
+        };
+        
+        onChange([...(value || []), mediaItem]);
+      }
+    } catch (error) {
+      console.error('Camera capture failed:', error);
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const handleBarcodeScanner = async () => {
+    try {
+      setUploading(true);
+      
+      // Check camera permission
+      const status = await BarcodeScanner.checkPermission({ force: true });
+      
+      if (status.granted) {
+        // Make background transparent
+        BarcodeScanner.hideBackground();
+        
+        const result = await BarcodeScanner.startScan();
+        
+        if (result.hasContent) {
+          // Create a simple text file with the barcode data
+          const barcodeData = `Barcode: ${result.content}\nType: ${result.format}\nScanned: ${new Date().toISOString()}`;
+          const blob = new Blob([barcodeData], { type: 'text/plain' });
+          const file = new File([blob], `barcode-${Date.now()}.txt`, { type: 'text/plain' });
+          
+          const mediaItem: MediaItem = {
+            file,
+            type: "image", // We'll treat it as image type for display purposes
+            url: URL.createObjectURL(blob),
+          };
+          
+          onChange([...(value || []), mediaItem]);
+        }
+      }
+    } catch (error) {
+      console.error('Barcode scanning failed:', error);
+    } finally {
+      setUploading(false);
+      BarcodeScanner.showBackground();
+      BarcodeScanner.stopScan();
+    }
+  };
+
   const removeItem = (idx: number) => {
     const copy = [...value];
     const [removed] = copy.splice(idx, 1);
@@ -54,14 +124,32 @@ const MediaUploader = ({
       <Label className="text-base font-medium">{title}</Label>
       <div className="flex flex-wrap gap-3">
         {(accept === "image" || accept === "both") && (
-          <Button
-            type="button"
-            variant="secondary"
-            onClick={() => imageInputRef.current?.click()}
-            disabled={uploading}
-          >
-            <ImageIcon /> Upload photo
-          </Button>
+          <>
+            <Button
+              type="button"
+              variant="secondary"
+              onClick={() => imageInputRef.current?.click()}
+              disabled={uploading}
+            >
+              <ImageIcon /> Upload photo
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={handleCameraCapture}
+              disabled={uploading}
+            >
+              <Camera /> Take photo
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={handleBarcodeScanner}
+              disabled={uploading}
+            >
+              <QrCode /> Scan QR/Barcode
+            </Button>
+          </>
         )}
         {(accept === "video" || accept === "both") && (
           <Button
