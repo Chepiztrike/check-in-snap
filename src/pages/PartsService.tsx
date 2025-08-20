@@ -55,51 +55,7 @@ const PartsService = () => {
   const [generalMedia, setGeneralMedia] = useState<MediaItem[]>([]);
   const [parts, setParts] = useState<PartEntry[]>([]);
   
-  const handleClientIdSubmit = () => {
-    if (clientIdInput.trim()) {
-      setSearchParams({ clientId: clientIdInput.trim() });
-    }
-  };
-  
-  // Show client ID input if not provided
-  if (!clientId) {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <Card className="w-full max-w-md">
-          <CardHeader>
-            <CardTitle className="text-center">
-              {t('parts.service.documentation')}
-            </CardTitle>
-            <CardDescription className="text-center">
-              {t('enter.client.id.continue')}
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div>
-              <Label htmlFor="clientId">{t('client.id')}</Label>
-              <Input
-                id="clientId"
-                value={clientIdInput}
-                onChange={(e) => setClientIdInput(e.target.value)}
-                placeholder="CLT-2025-0001"
-                onKeyPress={(e) => e.key === 'Enter' && handleClientIdSubmit()}
-              />
-            </div>
-            <div className="flex gap-2">
-              <Button onClick={handleClientIdSubmit} className="flex-1">
-                {t('continue')}
-              </Button>
-              <Button onClick={() => window.history.back()} variant="outline">
-                {t('back')}
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
-  
-  // Load client data when clientId is available
+  // Load client data when clientId is available - MOVED BEFORE CONDITIONAL RETURN
   useEffect(() => {
     if (clientId) {
       loadClientData();
@@ -158,6 +114,51 @@ const PartsService = () => {
       });
     }
   };
+  
+  const handleClientIdSubmit = () => {
+    if (clientIdInput.trim()) {
+      setSearchParams({ clientId: clientIdInput.trim() });
+    }
+  };
+  
+  // Show client ID input if not provided
+  if (!clientId) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <Card className="w-full max-w-md">
+          <CardHeader>
+            <CardTitle className="text-center">
+              {t('parts.service.documentation')}
+            </CardTitle>
+            <CardDescription className="text-center">
+              {t('enter.client.id.continue')}
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div>
+              <Label htmlFor="clientId">{t('client.id')}</Label>
+              <Input
+                id="clientId"
+                value={clientIdInput}
+                onChange={(e) => setClientIdInput(e.target.value)}
+                placeholder="CLT-2025-0001"
+                onKeyPress={(e) => e.key === 'Enter' && handleClientIdSubmit()}
+              />
+            </div>
+            <div className="flex gap-2">
+              <Button onClick={handleClientIdSubmit} className="flex-1">
+                {t('continue')}
+              </Button>
+              <Button onClick={() => window.history.back()} variant="outline">
+                {t('back')}
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+  
 
   const addPart = () => {
     const newPart: PartEntry = {
