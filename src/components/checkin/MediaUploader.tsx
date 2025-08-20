@@ -3,8 +3,24 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
 import { ImageIcon, VideoIcon, X, Camera, QrCode } from "lucide-react";
-import { Camera as CapacitorCamera, CameraResultType, CameraSource } from '@capacitor/camera';
-import { BarcodeScanner } from '@capacitor-community/barcode-scanner';
+import { Capacitor } from '@capacitor/core';
+
+// Dynamic imports for Capacitor plugins to avoid build issues
+const getCapacitorCamera = async () => {
+  if (Capacitor.isNativePlatform()) {
+    const { Camera, CameraResultType, CameraSource } = await import('@capacitor/camera');
+    return { Camera, CameraResultType, CameraSource };
+  }
+  return null;
+};
+
+const getBarcodeScanner = async () => {
+  if (Capacitor.isNativePlatform()) {
+    const { BarcodeScanner } = await import('@capacitor-community/barcode-scanner');
+    return { BarcodeScanner };
+  }
+  return null;
+};
 
 export type MediaItem = {
   url: string;
@@ -45,7 +61,23 @@ const MediaUploader = ({
   const handleCameraCapture = async () => {
     try {
       setUploading(true);
-      const image = await CapacitorCamera.getPhoto({
+      
+      // Check if we're on a native platform
+      if (!Capacitor.isNativePlatform()) {
+        // Fallback to regular file input for web
+        imageInputRef.current?.click();
+        return;
+      }
+
+      const capacitorCamera = await getCapacitorCamera();
+      if (!capacitorCamera) {
+        imageInputRef.current?.click();
+        return;
+      }
+
+      const { Camera, CameraResultType, CameraSource } = capacitorCamera;
+      
+      const image = await Camera.getPhoto({
         quality: 90,
         allowEditing: false,
         resultType: CameraResultType.Uri,
@@ -68,6 +100,8 @@ const MediaUploader = ({
       }
     } catch (error) {
       console.error('Camera capture failed:', error);
+      // Fallback to file input
+      imageInputRef.current?.click();
     } finally {
       setUploading(false);
     }
@@ -76,6 +110,20 @@ const MediaUploader = ({
   const handleBarcodeScanner = async () => {
     try {
       setUploading(true);
+      
+      // Check if we're on a native platform
+      if (!Capacitor.isNativePlatform()) {
+        alert('Barcode scanning is only available on mobile devices');
+        return;
+      }
+
+      const barcodeScanner = await getBarcodeScanner();
+      if (!barcodeScanner) {
+        alert('Barcode scanner not available');
+        return;
+      }
+
+      const { BarcodeScanner } = barcodeScanner;
       
       // Check camera permission
       const status = await BarcodeScanner.checkPermission({ force: true });
@@ -105,8 +153,13 @@ const MediaUploader = ({
       console.error('Barcode scanning failed:', error);
     } finally {
       setUploading(false);
-      BarcodeScanner.showBackground();
-      BarcodeScanner.stopScan();
+      if (Capacitor.isNativePlatform()) {
+        const barcodeScanner = await getBarcodeScanner();
+        if (barcodeScanner) {
+          barcodeScanner.BarcodeScanner.showBackground();
+          barcodeScanner.BarcodeScanner.stopScan();
+        }
+      }
     }
   };
 
