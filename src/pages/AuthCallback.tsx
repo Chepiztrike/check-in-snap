@@ -1,40 +1,65 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/contexts/AuthContext';
 import { Skeleton } from '@/components/ui/skeleton';
 
 const AuthCallback = () => {
   const navigate = useNavigate();
+  const { user, loading } = useAuth();
+
+  const [callbackHandled, setCallbackHandled] = useState(false);
+
+  // Watch for successful authentication and redirect
+  useEffect(() => {
+    if (!loading && user && callbackHandled) {
+      console.log('AuthCallback: User authenticated, redirecting to main app');
+      navigate('/', { replace: true });
+    }
+  }, [user, loading, callbackHandled, navigate]);
 
   useEffect(() => {
     const handleAuthCallback = async () => {
+      if (callbackHandled) return;
+      
+      console.log('AuthCallback: Starting auth callback process');
       try {
+        // Check if we already have a session
         const { data: { session }, error } = await supabase.auth.getSession();
+        console.log('AuthCallback: Session check result:', { hasSession: !!session, error });
         
-        if (session) {
-          // Successfully authenticated, redirect to main app
-          navigate('/', { replace: true });
-        } else if (error) {
-          console.error('Auth callback error:', error);
+        if (session?.user) {
+          console.log('AuthCallback: User already authenticated');
+          setCallbackHandled(true);
+          return;
+        }
+        
+        if (error) {
+          console.error('AuthCallback: Session error:', error);
+          navigate('/auth', { replace: true });
+          return;
+        }
+        
+        // Try to exchange code for session
+        console.log('AuthCallback: No session found, attempting code exchange');
+        const { error: exchangeError } = await supabase.auth.exchangeCodeForSession(window.location.href);
+        
+        if (exchangeError) {
+          console.error('AuthCallback: Code exchange error:', exchangeError);
           navigate('/auth', { replace: true });
         } else {
-          // If session isn't ready yet, try to recover from URL params
-          const { error: exchangeError } = await supabase.auth.exchangeCodeForSession(window.location.href);
-          if (exchangeError) {
-            console.error('Code exchange error:', exchangeError);
-            navigate('/auth', { replace: true });
-          } else {
-            navigate('/', { replace: true });
-          }
+          console.log('AuthCallback: Code exchange successful, waiting for auth state change');
+          setCallbackHandled(true);
+          // Auth state change will handle the redirect
         }
       } catch (error) {
-        console.error('Unexpected error in auth callback:', error);
+        console.error('AuthCallback: Unexpected error:', error);
         navigate('/auth', { replace: true });
       }
     };
 
     handleAuthCallback();
-  }, [navigate]);
+  }, [navigate, callbackHandled]);
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background p-6">

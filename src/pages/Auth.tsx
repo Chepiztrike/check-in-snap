@@ -22,8 +22,10 @@ const Auth = () => {
 
   // Redirect if already authenticated
   useEffect(() => {
+    console.log('Auth page: User state changed:', !!user, user?.id?.slice(-6));
     if (user) {
       const from = location.state?.from?.pathname || "/";
+      console.log('Auth page: Redirecting authenticated user to:', from);
       navigate(from, { replace: true });
     }
   }, [user, navigate, location]);
