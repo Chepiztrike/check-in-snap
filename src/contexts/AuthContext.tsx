@@ -8,8 +8,10 @@ interface AuthContextType {
   session: Session | null;
   loading: boolean;
   signIn: (email: string, password: string) => Promise<{ error: any }>;
-  signUp: (email: string, password: string) => Promise<{ error: any }>;
+  signUp: (email: string, password: string, skipEmailConfirmation?: boolean) => Promise<{ error: any }>;
   signOut: () => Promise<void>;
+  resetPassword: (email: string) => Promise<{ error: any }>;
+  updatePassword: (password: string) => Promise<{ error: any }>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -66,32 +68,95 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return { error };
   };
 
-  const signUp = async (email: string, password: string) => {
+  const signUp = async (email: string, password: string, skipEmailConfirmation = false) => {
     setLoading(true);
     const redirectUrl = `${window.location.origin}/auth/confirm`;
     
-    const { error } = await supabase.auth.signUp({
+    const signUpOptions: any = {
       email,
       password,
-      options: {
+    };
+
+    if (!skipEmailConfirmation) {
+      signUpOptions.options = {
         emailRedirectTo: redirectUrl
+      };
+    }
+    
+    const { error } = await supabase.auth.signUp(signUpOptions);
+    
+    if (error) {
+      // Handle specific error cases
+      if (error.message.includes('already registered')) {
+        toast({
+          title: "Account Already Exists",
+          description: "This email is already registered. Try signing in instead, or use the forgot password option if you can't remember your password.",
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Sign Up Error", 
+          description: error.message,
+          variant: "destructive",
+        });
       }
+    } else {
+      if (skipEmailConfirmation) {
+        toast({
+          title: "Account Created",
+          description: "Your account has been created successfully. You can now sign in.",
+        });
+      } else {
+        toast({
+          title: "Check your email",
+          description: "Please check your email for a confirmation link to complete registration. If you don't receive the email within a few minutes, check your spam folder.",
+        });
+      }
+    }
+    
+    setLoading(false);
+    return { error };
+  };
+
+  const resetPassword = async (email: string) => {
+    const redirectUrl = `${window.location.origin}/auth/reset-password`;
+    
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: redirectUrl,
     });
     
     if (error) {
       toast({
-        title: "Sign Up Error", 
+        title: "Reset Password Error",
         description: error.message,
         variant: "destructive",
       });
     } else {
       toast({
         title: "Check your email",
-        description: "Please check your email for a confirmation link to complete registration.",
+        description: "Please check your email for a password reset link.",
       });
     }
     
-    setLoading(false);
+    return { error };
+  };
+
+  const updatePassword = async (password: string) => {
+    const { error } = await supabase.auth.updateUser({ password });
+    
+    if (error) {
+      toast({
+        title: "Update Password Error",
+        description: error.message,
+        variant: "destructive",
+      });
+    } else {
+      toast({
+        title: "Password Updated",
+        description: "Your password has been updated successfully.",
+      });
+    }
+    
     return { error };
   };
 
@@ -108,6 +173,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     signIn,
     signUp,
     signOut,
+    resetPassword,
+    updatePassword,
   };
 
   return (
