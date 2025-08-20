@@ -65,11 +65,37 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     });
     
     if (error) {
-      toast({
-        title: "Sign In Error",
-        description: error.message,
-        variant: "destructive",
-      });
+      // Handle specific error cases
+      if (error.message.includes('Invalid login credentials')) {
+        // Check if user exists but email not confirmed
+        const { data } = await supabase.auth.resend({
+          type: 'signup',
+          email: email,
+          options: {
+            emailRedirectTo: `${window.location.origin}/auth/confirm`
+          }
+        });
+        
+        if (data) {
+          toast({
+            title: "Email Confirmation Required",
+            description: "Please check your email and click the confirmation link before signing in. We've sent you a new confirmation email.",
+            variant: "destructive",
+          });
+        } else {
+          toast({
+            title: "Sign In Error",
+            description: "Invalid email or password. Please check your credentials and try again.",
+            variant: "destructive",
+          });
+        }
+      } else {
+        toast({
+          title: "Sign In Error",
+          description: error.message,
+          variant: "destructive",
+        });
+      }
     }
     
     setLoading(false);

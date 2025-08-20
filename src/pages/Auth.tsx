@@ -56,7 +56,9 @@ const Auth = () => {
     const email = formData.get('email') as string;
     const password = formData.get('password') as string;
     
-    await signUp(email, password);
+    const { error } = await signUp(email, password);
+    
+    // Don't navigate on success - let user confirm email first
     setLoading(false);
   };
 
@@ -90,6 +92,15 @@ const Auth = () => {
       <div className="w-full max-w-md rounded-lg border bg-card p-6 shadow-sm">
         <h1 className="mb-2 text-2xl font-semibold">{t('welcome.back')}</h1>
         <p className="mb-6 text-muted-foreground">{t('sign.in.create.account')}</p>
+        
+        {/* Information alert about email confirmation */}
+        <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-md">
+          <p className="text-sm text-blue-800">
+            <strong>Note:</strong> After creating an account, you must confirm your email before signing in. 
+            Check your inbox (and spam folder) for the confirmation link.
+          </p>
+        </div>
+        
         <Tabs defaultValue="signin">
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="signin">{t('sign.in')}</TabsTrigger>
