@@ -82,10 +82,16 @@ const PartsService = () => {
           .maybeSingle();
         
         // Pre-populate vehicle details from client and check-in data
+        // Handle case where client data might be incomplete (customer_name = "Pending")
+        const isIncompleteClient = clientData.customer_name === 'Pending' || 
+                                  !clientData.customer_name || 
+                                  !clientData.customer_phone || 
+                                  !clientData.customer_email;
+        
         setVehicleDetails({
-          customerName: clientData.customer_name || "",
-          customerPhone: clientData.customer_phone || "",
-          customerEmail: clientData.customer_email || "",
+          customerName: isIncompleteClient ? "" : (clientData.customer_name || ""),
+          customerPhone: isIncompleteClient ? "" : (clientData.customer_phone || ""),
+          customerEmail: isIncompleteClient ? "" : (clientData.customer_email || ""),
           carModel: checkinData?.car_model || "",
           carYear: checkinData?.car_year || "",
           entryDate: new Date().toISOString().split('T')[0],
@@ -103,6 +109,15 @@ const PartsService = () => {
         if (sessionData) {
           setGeneralMedia((sessionData.general_media as unknown as MediaItem[]) || []);
           setParts((sessionData.parts_data as unknown as PartEntry[]) || []);
+        }
+        
+        // Show a toast if client data is incomplete
+        if (isIncompleteClient) {
+          toast({
+            title: 'Incomplete Client Information',
+            description: 'Please fill in the customer details below as they were not completed during check-in.',
+            variant: 'default'
+          });
         }
       }
     } catch (error) {
@@ -194,6 +209,23 @@ const PartsService = () => {
         .single();
 
       if (clientError) throw clientError;
+
+      // Update client information if customer details have been filled in
+      if (vehicleDetails.customerName && vehicleDetails.customerPhone && vehicleDetails.customerEmail) {
+        const { error: clientUpdateError } = await supabase
+          .from('clients')
+          .update({
+            customer_name: vehicleDetails.customerName,
+            customer_phone: vehicleDetails.customerPhone,
+            customer_email: vehicleDetails.customerEmail
+          })
+          .eq('id', clientData.id);
+
+        if (clientUpdateError) {
+          console.error('Error updating client:', clientUpdateError);
+          // Don't throw here, just log - we can still save the service session
+        }
+      }
 
       // Save or update parts service session
       const { error: sessionError } = await supabase
