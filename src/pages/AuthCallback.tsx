@@ -12,8 +12,8 @@ const AuthCallback = () => {
         const { data: { session }, error } = await supabase.auth.getSession();
         
         if (session) {
-          // Successfully authenticated, redirect to login page
-          navigate('/login', { replace: true });
+          // Successfully authenticated, redirect to main app
+          navigate('/', { replace: true });
         } else if (error) {
           console.error('Auth callback error:', error);
           navigate('/auth', { replace: true });
@@ -24,7 +24,7 @@ const AuthCallback = () => {
             console.error('Code exchange error:', exchangeError);
             navigate('/auth', { replace: true });
           } else {
-            navigate('/login', { replace: true });
+            navigate('/', { replace: true });
           }
         }
       } catch (error) {
