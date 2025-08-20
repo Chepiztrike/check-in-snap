@@ -15,6 +15,8 @@ import CheckOut from "./pages/CheckOut";
 import ClientPortal from "./pages/ClientPortal";
 import CheckInComplete from "./pages/CheckInComplete";
 import AuthConfirm from "./pages/AuthConfirm";
+import AuthCallback from "./pages/AuthCallback";
+import ResetPassword from "./pages/ResetPassword";
 
 const queryClient = new QueryClient();
 
@@ -29,6 +31,8 @@ const App = () => (
             <Route path="/" element={<Index />} />
             <Route path="/auth" element={<Auth />} />
             <Route path="/auth/confirm" element={<AuthConfirm />} />
+            <Route path="/auth/callback" element={<AuthCallback />} />
+            <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="/login" element={
               <ProtectedRoute>
                 <Login />
