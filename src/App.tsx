@@ -38,7 +38,11 @@ const App = () => (
                 <Login />
               </ProtectedRoute>
             } />
-            <Route path="/check-in" element={<CheckIn />} />
+            <Route path="/check-in" element={
+              <ProtectedRoute>
+                <CheckIn />
+              </ProtectedRoute>
+            } />
             <Route path="/parts-service" element={
               <ProtectedRoute>
                 <PartsService />
@@ -49,8 +53,16 @@ const App = () => (
                 <CheckOut />
               </ProtectedRoute>
             } />
-            <Route path="/client/:clientId" element={<ClientPortal />} />
-            <Route path="/check-in-complete/:clientNumber" element={<CheckInComplete />} />
+            <Route path="/client/:clientId" element={
+              <ProtectedRoute>
+                <ClientPortal />
+              </ProtectedRoute>
+            } />
+            <Route path="/check-in-complete/:clientNumber" element={
+              <ProtectedRoute>
+                <CheckInComplete />
+              </ProtectedRoute>
+            } />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
