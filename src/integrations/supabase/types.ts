@@ -422,9 +422,25 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      cleanup_pending_clients: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          cleaned_count: number
+        }[]
+      }
       generate_client_number: {
         Args: Record<PropertyKey, never>
         Returns: string
+      }
+      get_incomplete_clients: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          client_number: string
+          created_at: string
+          customer_name: string
+          has_checkin: boolean
+          id: string
+        }[]
       }
       has_role: {
         Args: {
