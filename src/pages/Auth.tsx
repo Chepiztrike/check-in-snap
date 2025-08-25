@@ -66,7 +66,7 @@ const Auth = () => {
       
       <div className="w-full max-w-md rounded-lg border bg-card p-6 shadow-sm">
         <h1 className="mb-2 text-2xl font-semibold">{t('welcome.back')}</h1>
-        <p className="mb-6 text-muted-foreground">{t('sign.in.create.account')}</p>
+        <p className="mb-6 text-muted-foreground">Mechanic and Staff Login - Access your account with your credentials</p>
         <Tabs defaultValue="signin">
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="signin">{t('sign.in')}</TabsTrigger>

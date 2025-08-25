@@ -1,22 +1,29 @@
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import Seo from "@/components/Seo";
-import { Wrench, User, Home } from "lucide-react";
+import { Wrench, FileText, CheckCircle, Settings, User, Shield, Eye, MessageSquare, FileCheck, ArrowRight, Loader2, Home } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useClientAuth } from "@/contexts/ClientAuthContext";
+import Seo from "@/components/Seo";
 import LanguageToggle from "@/components/LanguageToggle";
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
 
 const Login = () => {
-  const { t } = useLanguage();
   const navigate = useNavigate();
+  const { t } = useLanguage();
+  const { signIn, loading } = useClientAuth();
   const [clientId, setClientId] = useState("");
+  const [clientPassword, setClientPassword] = useState("");
 
-  const handleClientAccess = () => {
-    if (clientId.trim()) {
-      navigate(`/client/${clientId.trim()}`);
+  const handleClientAccess = async () => {
+    if (clientId.trim() && clientPassword.trim()) {
+      const { error } = await signIn(clientId.trim(), clientPassword.trim());
+      if (!error) {
+        navigate(`/client/${clientId.trim()}`);
+      }
     }
   };
 
@@ -28,16 +35,10 @@ const Login = () => {
       icon: Wrench
     },
     {
-      title: t('parts.service'),
-      description: t('parts.description'),
-      href: "/parts-service",
-      icon: Wrench
-    },
-    {
-      title: t('vehicle.checkout'),
-      description: t('checkout.description'),
-      href: "/check-out",
-      icon: Wrench
+      title: "Mechanic Login",
+      description: "Access mechanic portal with your account",
+      href: "/auth",
+      icon: Shield
     }
   ];
 
@@ -125,21 +126,44 @@ const Login = () => {
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div className="space-y-3">
-                  <Input
-                    placeholder={`${t('client.id')} (e.g., CLT-2024-0001)`}
-                    value={clientId}
-                    onChange={(e) => setClientId(e.target.value)}
-                    onKeyPress={(e) => e.key === 'Enter' && handleClientAccess()}
-                    className="text-center"
-                  />
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <label htmlFor="clientId" className="text-sm font-medium text-foreground">
+                      {t('client.id')}
+                    </label>
+                    <Input
+                      id="clientId"
+                      type="text"
+                      placeholder={t('enter.client.id')}
+                      value={clientId}
+                      onChange={(e) => setClientId(e.target.value)}
+                      className="bg-background"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label htmlFor="clientPassword" className="text-sm font-medium text-foreground">
+                      Client Password
+                    </label>
+                    <Input
+                      id="clientPassword"
+                      type="password"
+                      placeholder="Enter your client password"
+                      value={clientPassword}
+                      onChange={(e) => setClientPassword(e.target.value)}
+                      className="bg-background"
+                    />
+                  </div>
                   <Button 
                     onClick={handleClientAccess}
-                    disabled={!clientId.trim()}
-                    className="w-full font-medium"
-                    size="lg"
+                    className="w-full gap-2"
+                    disabled={!clientId.trim() || !clientPassword.trim() || loading}
                   >
-                    {t('access.portal.button')}
+                    {loading ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <ArrowRight className="h-4 w-4" />
+                    )}
+                    {loading ? 'Authenticating...' : t('access.client.portal')}
                   </Button>
                 </div>
                 <Separator />

@@ -18,6 +18,11 @@ export interface VehicleData {
   carYear: string;
 }
 
+interface GenerateCredentialsResponse {
+  success: boolean;
+  password?: string;
+}
+
 export const useClientData = () => {
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
@@ -51,6 +56,22 @@ export const useClientData = () => {
 
         if (error) throw error;
         client = data;
+
+        // Generate client credentials if customer name is not "Pending"
+        if (client.customer_name !== 'Pending') {
+          const { data: credentialsData, error: credentialsError } = await supabase
+            .rpc('generate_client_credentials', { client_id_input: client.id });
+          
+          if (credentialsError) {
+            console.error('Error generating client credentials:', credentialsError);
+          } else if (credentialsData) {
+            const response = credentialsData as unknown as GenerateCredentialsResponse;
+            if (response.success) {
+              console.log('Client password generated:', response.password);
+              // You might want to return this password to display to the user
+            }
+          }
+        }
       } else {
         // Create new client with complete data
         if (!clientData.customer_name || !clientData.customer_phone || !clientData.customer_email) {
@@ -71,6 +92,22 @@ export const useClientData = () => {
 
         if (error) throw error;
         client = data;
+
+        // Generate client credentials if customer name is not "Pending"
+        if (client.customer_name !== 'Pending') {
+          const { data: credentialsData, error: credentialsError } = await supabase
+            .rpc('generate_client_credentials', { client_id_input: client.id });
+          
+          if (credentialsError) {
+            console.error('Error generating client credentials:', credentialsError);
+          } else if (credentialsData) {
+            const response = credentialsData as unknown as GenerateCredentialsResponse;
+            if (response.success) {
+              console.log('Client password generated:', response.password);
+              // You might want to return this password to display to the user
+            }
+          }
+        }
       }
 
       return client;
