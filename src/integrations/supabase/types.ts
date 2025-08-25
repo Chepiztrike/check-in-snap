@@ -187,6 +187,41 @@ export type Database = {
           },
         ]
       }
+      client_credentials: {
+        Row: {
+          client_id: string
+          created_at: string
+          id: string
+          last_login: string | null
+          password_hash: string
+          updated_at: string
+        }
+        Insert: {
+          client_id: string
+          created_at?: string
+          id?: string
+          last_login?: string | null
+          password_hash: string
+          updated_at?: string
+        }
+        Update: {
+          client_id?: string
+          created_at?: string
+          id?: string
+          last_login?: string | null
+          password_hash?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "client_credentials_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: true
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       clients: {
         Row: {
           client_number: string
@@ -428,6 +463,10 @@ export type Database = {
           cleaned_count: number
         }[]
       }
+      generate_client_credentials: {
+        Args: { client_id_input: string }
+        Returns: Json
+      }
       generate_client_number: {
         Args: Record<PropertyKey, never>
         Returns: string
@@ -448,6 +487,10 @@ export type Database = {
           _user_id: string
         }
         Returns: boolean
+      }
+      verify_client_credentials: {
+        Args: { client_number_input: string; password_input: string }
+        Returns: Json
       }
     }
     Enums: {
