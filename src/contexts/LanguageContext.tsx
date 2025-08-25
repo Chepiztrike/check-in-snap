@@ -289,7 +289,7 @@ const translations = {
     
     // Mechanic workflow
     'mechanic.workflow': 'Mechanic Workflow',
-    'mechanic.next.steps': 'Tools for the mechanic to proceed with service',
+    'mechanic.next.steps': 'Choose your workflow to continue with service documentation',
     'mechanic.workflow.note': 'These links open the mechanic workflow in new tabs'
   },
   es: {
@@ -571,7 +571,7 @@ const translations = {
     
     // Mechanic workflow
     'mechanic.workflow': 'Flujo de Trabajo del Mecánico',
-    'mechanic.next.steps': 'Herramientas para que el mecánico proceda con el servicio',
+    'mechanic.next.steps': 'Elige tu flujo de trabajo para continuar con la documentación del servicio',
     'mechanic.workflow.note': 'Estos enlaces abren el flujo de trabajo del mecánico en nuevas pestañas'
   }
 };

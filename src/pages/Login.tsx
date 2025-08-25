@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { Wrench, Car, Cog, User, CheckCircle, Eye, Clock4, ThumbsUp, Home, Loader2, ArrowRight } from "lucide-react";
+import { Wrench, User, CheckCircle, Eye, Clock4, ThumbsUp, Home, Loader2, ArrowRight } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useClientAuth } from "@/contexts/ClientAuthContext";
 import Seo from "@/components/Seo";
@@ -27,26 +27,6 @@ const Login = () => {
     }
   };
 
-  const mechanicOptions = [
-    {
-      title: t('checkin.process'),
-      description: t('checkin.description'),
-      href: "/check-in",
-      icon: Wrench
-    },
-    {
-      title: t('parts.service'),
-      description: t('parts.description'),
-      href: "/parts-service",
-      icon: Cog
-    },
-    {
-      title: t('vehicle.checkout'),
-      description: t('checkout.description'),
-      href: "/check-out",
-      icon: Car
-    }
-  ];
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-secondary/30 to-muted/50">
@@ -65,7 +45,7 @@ const Login = () => {
           <LanguageToggle />
           <Button 
             variant="ghost" 
-            onClick={() => navigate('/dashboard')}
+            onClick={() => navigate('/')}
             className="flex items-center gap-2"
           >
             <Home className="w-4 h-4" />
@@ -114,26 +94,6 @@ const Login = () => {
                       <div className="text-sm opacity-90">{t('mechanic.login.description')}</div>
                     </div>
                   </Button>
-                  <Separator className="bg-white/20" />
-                  <div className="space-y-2">
-                    <p className="text-sm font-medium text-foreground mb-3">Workflow Access:</p>
-                    <div className="grid gap-2">
-                      {mechanicOptions.map((option) => (
-                        <Button
-                          key={option.title}
-                          onClick={() => navigate(option.href)}
-                          variant="outline"
-                          className="flex items-center gap-3 h-auto p-3 justify-start"
-                        >
-                          <option.icon className="h-4 w-4" />
-                          <div className="text-left">
-                            <div className="text-sm font-medium">{option.title}</div>
-                            <div className="text-xs text-muted-foreground">{option.description}</div>
-                          </div>
-                        </Button>
-                      ))}
-                    </div>
-                  </div>
                 </div>
               </CardContent>
             </Card>

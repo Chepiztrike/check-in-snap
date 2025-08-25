@@ -100,33 +100,77 @@ const Index = () => {
           </div>
         </section>
 
-        {/* Access Portal */}
-        <section className="container mx-auto py-16 px-4">
-          <div className="max-w-2xl mx-auto text-center">
-            <Card className="border-2 border-primary/20 shadow-lg">
-              <CardContent className="p-8 space-y-6">
-                <div className="w-16 h-16 mx-auto rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center">
-                  <CheckCircle className="w-8 h-8 text-primary-foreground" />
-                </div>
-                <div className="space-y-3">
-                  <h3 className="text-2xl font-semibold text-foreground">
-                    {t('access.system')}
-                  </h3>
-                  <p className="text-muted-foreground leading-relaxed">
-                    {t('access.system.description')}
-                  </p>
-                </div>
-                <Button 
-                  onClick={() => navigate(user ? '/login' : '/auth')}
-                  className="w-full font-medium"
-                  size="lg"
-                >
-                  {user ? t('access.portal') : t('sign.in')}
-                </Button>
-              </CardContent>
-            </Card>
-          </div>
-        </section>
+        {/* Mechanic Workflow - Only show if authenticated */}
+        {user && (
+          <section className="container mx-auto py-16 px-4">
+            <div className="max-w-4xl mx-auto">
+              <div className="text-center space-y-4 mb-12">
+                <h3 className="text-3xl font-bold text-foreground">
+                  {t('mechanic.workflow')}
+                </h3>
+                <p className="text-lg text-muted-foreground">
+                  {t('mechanic.next.steps')}
+                </p>
+              </div>
+              <div className="grid gap-6 md:grid-cols-3">
+                {features.map((feature) => (
+                  <Card key={feature.title} className="border-2 border-primary/20 shadow-lg hover:shadow-xl transition-shadow">
+                    <CardContent className="p-6 text-center space-y-4">
+                      <div className="w-16 h-16 mx-auto rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center">
+                        <feature.icon className="w-8 h-8 text-primary-foreground" />
+                      </div>
+                      <div className="space-y-2">
+                        <h4 className="text-xl font-semibold text-foreground">
+                          {feature.title}
+                        </h4>
+                        <p className="text-muted-foreground">
+                          {feature.description}
+                        </p>
+                      </div>
+                      <Button 
+                        onClick={() => navigate(feature.href)}
+                        className="w-full font-medium"
+                        variant={feature.variant}
+                      >
+                        {t('get.started')}
+                      </Button>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            </div>
+          </section>
+        )}
+
+        {/* Access Portal - Only show if not authenticated */}
+        {!user && (
+          <section className="container mx-auto py-16 px-4">
+            <div className="max-w-2xl mx-auto text-center">
+              <Card className="border-2 border-primary/20 shadow-lg">
+                <CardContent className="p-8 space-y-6">
+                  <div className="w-16 h-16 mx-auto rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center">
+                    <CheckCircle className="w-8 h-8 text-primary-foreground" />
+                  </div>
+                  <div className="space-y-3">
+                    <h3 className="text-2xl font-semibold text-foreground">
+                      {t('access.system')}
+                    </h3>
+                    <p className="text-muted-foreground leading-relaxed">
+                      {t('access.system.description')}
+                    </p>
+                  </div>
+                  <Button 
+                    onClick={() => navigate('/login')}
+                    className="w-full font-medium"
+                    size="lg"
+                  >
+                    {t('access.portal')}
+                  </Button>
+                </CardContent>
+              </Card>
+            </div>
+          </section>
+        )}
 
         {/* Client Tracking Section */}
         <section className="container mx-auto py-16 px-4">
