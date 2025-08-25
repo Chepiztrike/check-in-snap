@@ -24,8 +24,8 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
   }
 
   if (!user) {
-    // Redirect to auth page with return URL
-    return <Navigate to="/auth" state={{ from: location }} replace />;
+    // Redirect to main landing page with return URL
+    return <Navigate to="/" state={{ from: location }} replace />;
   }
 
   return <>{children}</>;
