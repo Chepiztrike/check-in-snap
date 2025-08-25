@@ -64,6 +64,14 @@ const App = () => (
                   </ClientProtectedRoute>
                 } 
               />
+              <Route 
+                path="/mechanic/client/:clientId" 
+                element={
+                  <ProtectedRoute>
+                    <ClientPortal />
+                  </ProtectedRoute>
+                } 
+              />
               <Route path="/check-in-complete/:clientNumber" element={<CheckInComplete />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />

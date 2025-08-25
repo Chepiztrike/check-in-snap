@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { CheckCircle, Copy, Phone, Mail, Car, QrCode } from "lucide-react";
+import { CheckCircle, Copy, Phone, Mail, Car, QrCode, Key, Eye, EyeOff } from "lucide-react";
 import { toast } from "sonner";
 import { useLanguage } from "@/contexts/LanguageContext";
 import LanguageToggle from "@/components/LanguageToggle";
@@ -11,8 +11,14 @@ import LanguageToggle from "@/components/LanguageToggle";
 const CheckInComplete = () => {
   const { clientNumber } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
   const { t } = useLanguage();
   const [copied, setCopied] = useState(false);
+  const [passwordCopied, setPasswordCopied] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  
+  // Get password from navigation state
+  const clientPassword = location.state?.password;
 
   const clientPortalUrl = `${window.location.origin}/client/${clientNumber}`;
 
@@ -28,6 +34,15 @@ const CheckInComplete = () => {
   const handleCopyUrl = () => {
     navigator.clipboard.writeText(clientPortalUrl);
     toast.success(t('tracking.url.copied'));
+  };
+
+  const handleCopyPassword = () => {
+    if (clientPassword) {
+      navigator.clipboard.writeText(clientPassword);
+      setPasswordCopied(true);
+      toast.success(t('password.copied'));
+      setTimeout(() => setPasswordCopied(false), 2000);
+    }
   };
 
   return (
@@ -85,6 +100,44 @@ const CheckInComplete = () => {
                   {copied ? t('copied') : t('copy')}
                 </Button>
               </div>
+              
+              {/* Client Password Card - Only show if password is available */}
+              {clientPassword && (
+                <div className="space-y-2 border-t pt-4">
+                  <p className="text-sm font-medium flex items-center gap-2">
+                    <Key className="h-4 w-4" />
+                    {t('client.password')}
+                  </p>
+                  <div className="flex items-center gap-2 p-3 bg-yellow-50 dark:bg-yellow-950 rounded border border-yellow-200 dark:border-yellow-800">
+                    <div className="flex-1">
+                      <p className="text-sm font-mono text-yellow-800 dark:text-yellow-200">
+                        {showPassword ? clientPassword : '••••••••'}
+                      </p>
+                    </div>
+                    <div className="flex gap-1">
+                      <Button 
+                        variant="ghost" 
+                        size="sm"
+                        onClick={() => setShowPassword(!showPassword)}
+                        className="h-8 w-8 p-0"
+                      >
+                        {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                      </Button>
+                      <Button 
+                        variant="ghost" 
+                        size="sm"
+                        onClick={handleCopyPassword}
+                        className="h-8 w-8 p-0"
+                      >
+                        <Copy className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </div>
+                  <p className="text-xs text-yellow-700 dark:text-yellow-300 bg-yellow-50 dark:bg-yellow-950 p-2 rounded border border-yellow-200 dark:border-yellow-800">
+                    ⚠️ {t('password.security.warning')}
+                  </p>
+                </div>
+              )}
               
               <div className="space-y-2">
                 <p className="text-sm font-medium">{t('tracking.url')}</p>

@@ -98,6 +98,7 @@ const CheckIn = () => {
   // Client and check-in state
   const [clientNumber, setClientNumber] = useState<string | null>(null);
   const [clientId, setClientId] = useState<string | null>(null);
+  const [clientPassword, setClientPassword] = useState<string | null>(null);
 
   // Vehicle fields
   const [customerName, setCustomerName] = useState("");
@@ -234,6 +235,19 @@ const CheckIn = () => {
       setClientId(newClientId);
       setClientNumber(generatedNumber);
 
+      // Generate client credentials and capture password
+      const { data: credentialsData, error: credentialsError } = await supabase
+        .rpc('generate_client_credentials', { client_id_input: newClientId });
+      
+      if (credentialsError) {
+        console.error('Error generating client credentials:', credentialsError);
+      } else if (credentialsData) {
+        const response = credentialsData as any;
+        if (response.success && response.password) {
+          setClientPassword(response.password);
+        }
+      }
+
       // Create the check-in record with car model and year
       const { data: checkinData, error: checkinError } = await supabase
         .from('checkins')
@@ -340,7 +354,9 @@ const CheckIn = () => {
       
       // Navigate to completion screen using the generated number directly
       // (avoiding race condition with async state update)
-      navigate(`/check-in-complete/${generatedNumber}`);
+      navigate(`/check-in-complete/${generatedNumber}`, { 
+        state: { password: clientPassword } 
+      });
     } catch (error) {
       console.error('Error completing check-in:', error);
       toast.error('Failed to complete check-in');

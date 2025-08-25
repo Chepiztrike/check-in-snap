@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -11,6 +11,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useAuth } from "@/contexts/AuthContext";
 import LanguageToggle from "@/components/LanguageToggle";
 
 const SUPABASE_URL = "https://fdrqyrbxajmptwlbnhet.supabase.co";
@@ -82,7 +83,9 @@ interface CheckoutSession {
 const ClientPortal = () => {
   const { clientId } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
   const { t } = useLanguage();
+  const { user } = useAuth();
   const [client, setClient] = useState<Client | null>(null);
   const [checkin, setCheckin] = useState<Checkin | null>(null);
   const [checkinItems, setCheckinItems] = useState<CheckinItem[]>([]);
@@ -91,6 +94,9 @@ const ClientPortal = () => {
   const [partsServiceSession, setPartsServiceSession] = useState<PartsServiceSession | null>(null);
   const [checkoutSession, setCheckoutSession] = useState<CheckoutSession | null>(null);
   const [loading, setLoading] = useState(true);
+
+  // Determine if this is mechanic access based on route
+  const isMechanicAccess = location.pathname.startsWith('/mechanic/');
 
   useEffect(() => {
     if (clientId) {
@@ -444,7 +450,7 @@ const ClientPortal = () => {
             <p className="text-muted-foreground">{t('track.service.progress')}</p>
           </div>
           <div className="flex items-center gap-4">
-            <Button variant="outline" onClick={() => navigate('/')} className="flex items-center gap-2">
+            <Button variant="outline" onClick={() => navigate(isMechanicAccess ? '/dashboard' : '/')} className="flex items-center gap-2">
               <Home className="h-4 w-4" />
               {t('home')}
             </Button>

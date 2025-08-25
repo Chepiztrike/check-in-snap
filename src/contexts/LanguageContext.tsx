@@ -48,8 +48,10 @@ const translations = {
     'track.service': 'Track Service',
     'access.client.portal': 'Access Client Portal',
     'enter.client.id': 'Enter Client ID',
-    'client.password': 'Client Password',
-    'enter.client.password': 'Enter your client password',
+        'client.password': 'Client Password',
+        'enter.client.password': 'Enter your client password',
+        'password.copied': 'Password copied to clipboard',
+        'password.security.warning': 'Save this password securely. It will be needed to access the client portal.',
     'authenticating': 'Authenticating...',
     
     // Auth page
@@ -333,6 +335,8 @@ const translations = {
     'enter.client.id': 'Ingrese ID del Cliente',
     'client.password': 'Contraseña del Cliente',
     'enter.client.password': 'Ingrese su contraseña de cliente',
+    'password.copied': 'Contraseña copiada al portapapeles',
+    'password.security.warning': 'Guarde esta contraseña de forma segura. Será necesaria para acceder al portal del cliente.',
     'authenticating': 'Autenticando...',
     
     // Auth page

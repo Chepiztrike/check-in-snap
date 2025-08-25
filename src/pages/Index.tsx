@@ -42,7 +42,9 @@ const Index = () => {
 
   const handleTrackService = () => {
     if (clientId.trim()) {
-      navigate(`/client/${clientId.trim()}`);
+      // Navigate to mechanic client route if user is authenticated, otherwise client route
+      const route = user ? `/mechanic/client/${clientId.trim()}` : `/client/${clientId.trim()}`;
+      navigate(route);
     }
   };
 

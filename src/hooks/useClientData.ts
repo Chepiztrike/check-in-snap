@@ -36,10 +36,11 @@ export const useClientData = () => {
   const createOrUpdateClient = useCallback(async (
     clientData: Partial<ClientData>,
     vehicleData?: VehicleData
-  ): Promise<ClientData> => {
+  ): Promise<{ client: ClientData; password?: string }> => {
     setLoading(true);
     try {
       let client: ClientData;
+      let generatedPassword: string | undefined;
 
       if (clientData.id) {
         // Update existing client
@@ -66,9 +67,9 @@ export const useClientData = () => {
             console.error('Error generating client credentials:', credentialsError);
           } else if (credentialsData) {
             const response = credentialsData as unknown as GenerateCredentialsResponse;
-            if (response.success) {
-              console.log('Client password generated:', response.password);
-              // You might want to return this password to display to the user
+            if (response.success && response.password) {
+              generatedPassword = response.password;
+              console.log('Client password generated:', generatedPassword);
             }
           }
         }
@@ -102,15 +103,15 @@ export const useClientData = () => {
             console.error('Error generating client credentials:', credentialsError);
           } else if (credentialsData) {
             const response = credentialsData as unknown as GenerateCredentialsResponse;
-            if (response.success) {
-              console.log('Client password generated:', response.password);
-              // You might want to return this password to display to the user
+            if (response.success && response.password) {
+              generatedPassword = response.password;
+              console.log('Client password generated:', generatedPassword);
             }
           }
         }
       }
 
-      return client;
+      return { client, password: generatedPassword };
     } catch (error) {
       console.error('Error creating/updating client:', error);
       toast({
