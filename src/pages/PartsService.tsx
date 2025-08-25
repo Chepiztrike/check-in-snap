@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "@/hooks/use-toast";
-import { Download, Plus, ArrowLeft } from "lucide-react";
+import { Download, Plus, ArrowLeft, Save, Loader2 } from "lucide-react";
 import Seo from "@/components/Seo";
 import PartsItemUploader from "@/components/service/PartsItemUploader";
 import MediaUploader, { MediaItem } from "@/components/checkin/MediaUploader";
@@ -44,6 +44,8 @@ const PartsService = () => {
   // Data recovery state
   const [needsDataRecovery, setNeedsDataRecovery] = useState(false);
   const [incompleteClientData, setIncompleteClientData] = useState<any>(null);
+  const [isSaving, setIsSaving] = useState(false);
+  const [lastSaved, setLastSaved] = useState<Date | null>(null);
   
   // All hooks must be declared before any conditional returns
   const [vehicleDetails, setVehicleDetails] = useState<VehicleDetails>({
@@ -227,6 +229,26 @@ const PartsService = () => {
   };
 
   const handleSave = async () => {
+    // Validate required fields
+    if (!vehicleDetails.customerName?.trim()) {
+      toast({
+        title: 'Validation Error',
+        description: 'Customer name is required.',
+        variant: 'destructive'
+      });
+      return;
+    }
+
+    if (!vehicleDetails.licensePlate?.trim()) {
+      toast({
+        title: 'Validation Error', 
+        description: 'License plate is required.',
+        variant: 'destructive'
+      });
+      return;
+    }
+
+    setIsSaving(true);
     try {
       if (!clientId) return;
       
@@ -271,6 +293,7 @@ const PartsService = () => {
 
       if (sessionError) throw sessionError;
 
+      setLastSaved(new Date());
       toast({
         title: t('data.saved.successfully'),
         description: t('parts.service.saved'),
@@ -279,9 +302,11 @@ const PartsService = () => {
       console.error('Error saving parts service data:', error);
       toast({
         title: 'Error saving data',
-        description: 'Could not save parts service information.',
+        description: error instanceof Error ? error.message : 'Could not save parts service information.',
         variant: 'destructive'
       });
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -337,9 +362,23 @@ const PartsService = () => {
           <div className="text-sm bg-primary/10 text-primary px-3 py-1 rounded-full border border-primary/20">
             {t('client.id')}: <span className="font-mono font-semibold">{clientId}</span>
           </div>
-          <Button onClick={handleSave} variant="default" className="gap-2">
-            <Download className="h-4 w-4" />
-            {t('save.data')}
+          {lastSaved && (
+            <div className="text-xs text-muted-foreground">
+              Last saved: {lastSaved.toLocaleTimeString()}
+            </div>
+          )}
+          <Button 
+            onClick={handleSave} 
+            disabled={isSaving}
+            variant="default" 
+            className="gap-2"
+          >
+            {isSaving ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <Save className="h-4 w-4" />
+            )}
+            {isSaving ? 'Saving...' : t('save.data')}
           </Button>
           <Button onClick={handleExport} variant="outline" className="gap-2">
             <Download className="h-4 w-4" />
