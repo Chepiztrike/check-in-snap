@@ -12,6 +12,7 @@ import CheckoutItemUploader from "@/components/checkout/CheckoutItemUploader";
 import MediaUploader, { MediaItem } from "@/components/checkin/MediaUploader";
 import { useLanguage } from "@/contexts/LanguageContext";
 import LanguageToggle from "@/components/LanguageToggle";
+import { ClientDataRecovery } from "@/components/recovery/ClientDataRecovery";
 
 interface CheckoutItemData {
   media: MediaItem[];
@@ -50,6 +51,10 @@ const CheckOut = () => {
   const clientId = searchParams.get('clientId');
   const { t } = useLanguage();
   
+  // Data recovery state
+  const [needsDataRecovery, setNeedsDataRecovery] = useState(false);
+  const [incompleteClientData, setIncompleteClientData] = useState<any>(null);
+  
   // ALL HOOKS MUST BE DECLARED BEFORE ANY CONDITIONAL RETURNS
   const checkoutItems = getCheckoutItems(t);
   const [vehicleDetails, setVehicleDetails] = useState<VehicleDetails>({
@@ -85,6 +90,18 @@ const CheckOut = () => {
       if (clientError) throw clientError;
       
       if (clientData) {
+        // Check if client data is incomplete (Pending status)
+        const isIncompleteClient = clientData.customer_name === 'Pending' || 
+                                  !clientData.customer_name || 
+                                  !clientData.customer_phone || 
+                                  !clientData.customer_email;
+        
+        if (isIncompleteClient) {
+          setIncompleteClientData(clientData);
+          setNeedsDataRecovery(true);
+          return;
+        }
+        
         // Load existing check-in data
         const { data: checkinData } = await supabase
           .from('checkins')
@@ -130,6 +147,34 @@ const CheckOut = () => {
       setSearchParams({ clientId: clientIdInput.trim() });
     }
   };
+
+  const handleDataRecoveryComplete = (clientData: any) => {
+    setVehicleDetails(prev => ({
+      ...prev,
+      customerName: clientData.customer_name || "",
+      customerPhone: clientData.customer_phone || "",
+      customerEmail: clientData.customer_email || ""
+    }));
+    setNeedsDataRecovery(false);
+    setIncompleteClientData(null);
+  };
+
+  const handleDataRecoverySkip = () => {
+    setNeedsDataRecovery(false);
+    setIncompleteClientData(null);
+  };
+  
+  // Show data recovery if client data is incomplete
+  if (needsDataRecovery && incompleteClientData) {
+    return (
+      <ClientDataRecovery
+        clientId={incompleteClientData.id}
+        clientNumber={incompleteClientData.client_number}
+        onRecoveryComplete={handleDataRecoveryComplete}
+        onSkip={handleDataRecoverySkip}
+      />
+    );
+  }
   
   // Show client ID input if not provided
   if (!clientId) {

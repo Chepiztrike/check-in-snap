@@ -13,6 +13,7 @@ import PartsItemUploader from "@/components/service/PartsItemUploader";
 import MediaUploader, { MediaItem } from "@/components/checkin/MediaUploader";
 import { useLanguage } from "@/contexts/LanguageContext";
 import LanguageToggle from "@/components/LanguageToggle";
+import { ClientDataRecovery } from "@/components/recovery/ClientDataRecovery";
 
 interface PartEntry {
   id: string;
@@ -39,6 +40,10 @@ const PartsService = () => {
   const [clientIdInput, setClientIdInput] = useState(searchParams.get('clientId') || '');
   const clientId = searchParams.get('clientId');
   const { t } = useLanguage();
+  
+  // Data recovery state
+  const [needsDataRecovery, setNeedsDataRecovery] = useState(false);
+  const [incompleteClientData, setIncompleteClientData] = useState<any>(null);
   
   // All hooks must be declared before any conditional returns
   const [vehicleDetails, setVehicleDetails] = useState<VehicleDetails>({
@@ -74,6 +79,18 @@ const PartsService = () => {
       if (clientError) throw clientError;
       
       if (clientData) {
+        // Check if client data is incomplete (Pending status)
+        const isIncompleteClient = clientData.customer_name === 'Pending' || 
+                                  !clientData.customer_name || 
+                                  !clientData.customer_phone || 
+                                  !clientData.customer_email;
+        
+        if (isIncompleteClient) {
+          setIncompleteClientData(clientData);
+          setNeedsDataRecovery(true);
+          return;
+        }
+        
         // Load existing check-in data
         const { data: checkinData } = await supabase
           .from('checkins')
@@ -81,17 +98,10 @@ const PartsService = () => {
           .eq('client_id', clientData.id)
           .maybeSingle();
         
-        // Pre-populate vehicle details from client and check-in data
-        // Handle case where client data might be incomplete (customer_name = "Pending")
-        const isIncompleteClient = clientData.customer_name === 'Pending' || 
-                                  !clientData.customer_name || 
-                                  !clientData.customer_phone || 
-                                  !clientData.customer_email;
-        
         setVehicleDetails({
-          customerName: isIncompleteClient ? "" : (clientData.customer_name || ""),
-          customerPhone: isIncompleteClient ? "" : (clientData.customer_phone || ""),
-          customerEmail: isIncompleteClient ? "" : (clientData.customer_email || ""),
+          customerName: clientData.customer_name || "",
+          customerPhone: clientData.customer_phone || "",
+          customerEmail: clientData.customer_email || "",
           carModel: checkinData?.car_model || "",
           carYear: checkinData?.car_year || "",
           entryDate: new Date().toISOString().split('T')[0],
@@ -110,15 +120,6 @@ const PartsService = () => {
           setGeneralMedia((sessionData.general_media as unknown as MediaItem[]) || []);
           setParts((sessionData.parts_data as unknown as PartEntry[]) || []);
         }
-        
-        // Show a toast if client data is incomplete
-        if (isIncompleteClient) {
-          toast({
-            title: 'Incomplete Client Information',
-            description: 'Please fill in the customer details below as they were not completed during check-in.',
-            variant: 'default'
-          });
-        }
       }
     } catch (error) {
       console.error('Error loading client data:', error);
@@ -135,6 +136,34 @@ const PartsService = () => {
       setSearchParams({ clientId: clientIdInput.trim() });
     }
   };
+
+  const handleDataRecoveryComplete = (clientData: any) => {
+    setVehicleDetails(prev => ({
+      ...prev,
+      customerName: clientData.customer_name || "",
+      customerPhone: clientData.customer_phone || "",
+      customerEmail: clientData.customer_email || ""
+    }));
+    setNeedsDataRecovery(false);
+    setIncompleteClientData(null);
+  };
+
+  const handleDataRecoverySkip = () => {
+    setNeedsDataRecovery(false);
+    setIncompleteClientData(null);
+  };
+  
+  // Show data recovery if client data is incomplete
+  if (needsDataRecovery && incompleteClientData) {
+    return (
+      <ClientDataRecovery
+        clientId={incompleteClientData.id}
+        clientNumber={incompleteClientData.client_number}
+        onRecoveryComplete={handleDataRecoveryComplete}
+        onSkip={handleDataRecoverySkip}
+      />
+    );
+  }
   
   // Show client ID input if not provided
   if (!clientId) {

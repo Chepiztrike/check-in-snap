@@ -151,10 +151,8 @@ const CheckIn = () => {
   const currentStep = stepsConfig[stepIndex];
   const progress = Math.round((stepIndex + 1) / stepsConfig.length * 100);
   const containerRef = useRef<HTMLDivElement>(null);
-  // Generate client ID immediately when component loads
-  useEffect(() => {
-    generateClientAndId();
-  }, []);
+  // Client creation is now deferred until form completion
+  // No longer creating clients immediately to prevent "Pending" records
 
   useEffect(() => {
     const el = containerRef.current;
@@ -203,33 +201,6 @@ const CheckIn = () => {
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
   };
-  const generateClientAndId = async () => {
-    try {
-      // First generate the client number
-      const generatedNumber = await generateClientNumber();
-      
-      // Create a client record with the generated number
-      const { data: clientData, error: clientError } = await supabase
-        .from('clients')
-        .insert({
-          client_number: generatedNumber,
-          customer_name: 'Pending',
-          customer_phone: '',
-          customer_email: ''
-        })
-        .select()
-        .single();
-
-      if (clientError) throw clientError;
-
-      setClientId(clientData.id);
-      setClientNumber(generatedNumber);
-    } catch (error) {
-      console.error('Error generating client ID:', error);
-      toast.error('Failed to generate client ID');
-    }
-  };
-
   const generateClientNumber = async (): Promise<string> => {
     const { data, error } = await supabase.rpc('generate_client_number');
     if (error) throw error;
@@ -237,29 +208,37 @@ const CheckIn = () => {
   };
 
   const handleFinish = async () => {
-    if (!clientId || !clientNumber) {
-      toast.error('Client ID not generated. Please try again.');
-      return;
-    }
-
     try {
-      // Update the client with complete customer information
-      const { error: clientUpdateError } = await supabase
+      // Validate all required fields
+      if (!customerName || !customerPhone || !customerEmail || !plate || !vin || !mileage || !carModel || !carYear) {
+        toast.error('Please fill in all required vehicle information');
+        return;
+      }
+
+      // Generate client number and create client with complete data
+      const generatedNumber = await generateClientNumber();
+      const { data: clientData, error: clientError } = await supabase
         .from('clients')
-        .update({
+        .insert({
+          client_number: generatedNumber,
           customer_name: customerName,
           customer_phone: customerPhone,
           customer_email: customerEmail
         })
-        .eq('id', clientId);
+        .select()
+        .single();
 
-      if (clientUpdateError) throw clientUpdateError;
+      if (clientError) throw clientError;
+
+      const newClientId = clientData.id;
+      setClientId(newClientId);
+      setClientNumber(generatedNumber);
 
       // Create the check-in record with car model and year
       const { data: checkinData, error: checkinError } = await supabase
         .from('checkins')
         .insert({
-          client_id: clientId,
+          client_id: newClientId,
           mechanic_id: null, // No mechanic required for demo
           vehicle_vin: vin,
           plate: plate,
