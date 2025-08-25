@@ -41,7 +41,11 @@ const App = () => (
                   <Index />
                 </ProtectedRoute>
               } />
-              <Route path="/check-in" element={<CheckIn />} />
+              <Route path="/check-in" element={
+                <ProtectedRoute>
+                  <CheckIn />
+                </ProtectedRoute>
+              } />
               <Route path="/parts-service" element={
                 <ProtectedRoute>
                   <PartsService />

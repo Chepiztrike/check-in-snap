@@ -40,6 +40,17 @@ const translations = {
     'approve.checkout': 'Approve checkout',
     'ready.transform': 'Ready to Transform Your Service Process?',
     'start.workflow': 'Start with any workflow that fits your current needs.',
+    'mechanic.login': 'Mechanic Login',
+    'mechanic.login.description': 'Access mechanic portal with your account',
+    'client.tracking': 'Client Tracking',
+    'track.service.progress': 'Track your vehicle service progress',
+    'client.id': 'Client ID',
+    'track.service': 'Track Service',
+    'access.client.portal': 'Access Client Portal',
+    'enter.client.id': 'Enter Client ID',
+    'client.password': 'Client Password',
+    'enter.client.password': 'Enter your client password',
+    'authenticating': 'Authenticating...',
     
     // Auth page
     'welcome.back': 'Welcome back',
@@ -201,9 +212,7 @@ const translations = {
     
     // Client Portal translations
     'client.portal': 'Client Portal',
-    'track.service.progress': 'Track your vehicle service progress',
     'client.information': 'Client Information',
-    'client.id': 'Client ID',
     'service.progress': 'Service Progress',
     'current.status.vehicle': 'Current status of your vehicle service',
     'vehicle.received': 'Vehicle Received',
@@ -232,8 +241,6 @@ const translations = {
     'return.home': 'Return Home',
     'approved': 'Approved',
     'pending.approval': 'Pending Approval',
-    'client.tracking': 'Client Tracking',
-    'track.service': 'Track Service',
     
     // Check-in completion translations
     'vehicle.successfully.registered': 'Your vehicle has been successfully registered',
@@ -316,6 +323,17 @@ const translations = {
     'approve.checkout': 'Aprobar check-out',
     'ready.transform': '¿Listo para Transformar tu Proceso de Servicio?',
     'start.workflow': 'Comienza con cualquier flujo de trabajo que se ajuste a tus necesidades actuales.',
+    'mechanic.login': 'Acceso de Mecánico',
+    'mechanic.login.description': 'Accede al portal de mecánico con tu cuenta',
+    'client.tracking': 'Rastreo de Cliente',
+    'track.service.progress': 'Rastrea el progreso del servicio de tu vehículo',
+    'client.id': 'ID del Cliente',
+    'track.service': 'Rastrear Servicio',
+    'access.client.portal': 'Acceder al Portal del Cliente',
+    'enter.client.id': 'Ingrese ID del Cliente',
+    'client.password': 'Contraseña del Cliente',
+    'enter.client.password': 'Ingrese su contraseña de cliente',
+    'authenticating': 'Autenticando...',
     
     // Auth page
     'welcome.back': 'Bienvenido de vuelta',
@@ -477,9 +495,7 @@ const translations = {
     
     // Client Portal translations
     'client.portal': 'Portal del Cliente',
-    'track.service.progress': 'Rastrea el progreso del servicio de tu vehículo',
     'client.information': 'Información del Cliente',
-    'client.id': 'ID del Cliente',
     'service.progress': 'Progreso del Servicio',
     'current.status.vehicle': 'Estado actual del servicio de tu vehículo',
     'vehicle.received': 'Vehículo Recibido',
@@ -508,8 +524,6 @@ const translations = {
     'return.home': 'Volver al Inicio',
     'approved': 'Aprobado',
     'pending.approval': 'Pendiente de Aprobación',
-    'client.tracking': 'Seguimiento del Cliente',
-    'track.service': 'Rastrear Servicio',
     
     // Check-in completion translations
     'vehicle.successfully.registered': 'Tu vehículo ha sido registrado exitosamente',

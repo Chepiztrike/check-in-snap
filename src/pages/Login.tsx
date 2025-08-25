@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { Wrench, FileText, CheckCircle, Settings, User, Shield, Eye, MessageSquare, FileCheck, ArrowRight, Loader2, Home } from "lucide-react";
+import { Wrench, Car, Cog, User, CheckCircle, Eye, Clock4, ThumbsUp, Home, Loader2, ArrowRight } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useClientAuth } from "@/contexts/ClientAuthContext";
 import Seo from "@/components/Seo";
@@ -35,10 +35,16 @@ const Login = () => {
       icon: Wrench
     },
     {
-      title: "Mechanic Login",
-      description: "Access mechanic portal with your account",
-      href: "/auth",
-      icon: Shield
+      title: t('parts.service'),
+      description: t('parts.description'),
+      href: "/parts-service",
+      icon: Cog
+    },
+    {
+      title: t('vehicle.checkout'),
+      description: t('checkout.description'),
+      href: "/check-out",
+      icon: Car
     }
   ];
 
@@ -59,7 +65,7 @@ const Login = () => {
           <LanguageToggle />
           <Button 
             variant="ghost" 
-            onClick={() => navigate('/')}
+            onClick={() => navigate('/dashboard')}
             className="flex items-center gap-2"
           >
             <Home className="w-4 h-4" />
@@ -96,21 +102,39 @@ const Login = () => {
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
-                {mechanicOptions.map((option, index) => (
-                   <Button
-                     key={index}
-                     variant="outline"
-                     className="w-full justify-start h-auto p-4 min-h-[100px] overflow-hidden"
-                     onClick={() => navigate(option.href)}
-                   >
-                     <div className="text-left w-full pr-2">
-                       <div className="font-medium text-base mb-2 line-clamp-1">{option.title}</div>
-                        <div className="text-sm font-medium leading-tight line-clamp-2 group-hover:text-white">
-                          {option.description}
-                        </div>
-                     </div>
-                   </Button>
-                ))}
+                <div className="space-y-4">
+                  <Button
+                    onClick={() => navigate("/auth")}
+                    variant="secondary"
+                    className="w-full flex items-center gap-3 h-auto p-4 justify-center bg-white/10 hover:bg-white/20 border-white/20 text-white hover:text-white"
+                  >
+                    <User className="h-5 w-5" />
+                    <div className="text-center">
+                      <div className="font-medium">{t('mechanic.login')}</div>
+                      <div className="text-sm opacity-90">{t('mechanic.login.description')}</div>
+                    </div>
+                  </Button>
+                  <Separator className="bg-white/20" />
+                  <div className="space-y-2">
+                    <p className="text-sm font-medium text-foreground mb-3">Workflow Access:</p>
+                    <div className="grid gap-2">
+                      {mechanicOptions.map((option) => (
+                        <Button
+                          key={option.title}
+                          onClick={() => navigate(option.href)}
+                          variant="outline"
+                          className="flex items-center gap-3 h-auto p-3 justify-start"
+                        >
+                          <option.icon className="h-4 w-4" />
+                          <div className="text-left">
+                            <div className="text-sm font-medium">{option.title}</div>
+                            <div className="text-xs text-muted-foreground">{option.description}</div>
+                          </div>
+                        </Button>
+                      ))}
+                    </div>
+                  </div>
+                </div>
               </CardContent>
             </Card>
 
@@ -142,12 +166,12 @@ const Login = () => {
                   </div>
                   <div className="space-y-2">
                     <label htmlFor="clientPassword" className="text-sm font-medium text-foreground">
-                      Client Password
+                      {t('client.password')}
                     </label>
                     <Input
                       id="clientPassword"
                       type="password"
-                      placeholder="Enter your client password"
+                      placeholder={t('enter.client.password')}
                       value={clientPassword}
                       onChange={(e) => setClientPassword(e.target.value)}
                       className="bg-background"
@@ -163,7 +187,7 @@ const Login = () => {
                     ) : (
                       <ArrowRight className="h-4 w-4" />
                     )}
-                    {loading ? 'Authenticating...' : t('access.client.portal')}
+                    {loading ? t('authenticating') : t('access.client.portal')}
                   </Button>
                 </div>
                 <Separator />
