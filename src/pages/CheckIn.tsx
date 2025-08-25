@@ -338,8 +338,9 @@ const CheckIn = () => {
 
       toast.success('Check-in completed successfully!');
       
-      // Navigate to completion screen
-      navigate(`/check-in-complete/${clientNumber}`);
+      // Navigate to completion screen using the generated number directly
+      // (avoiding race condition with async state update)
+      navigate(`/check-in-complete/${generatedNumber}`);
     } catch (error) {
       console.error('Error completing check-in:', error);
       toast.error('Failed to complete check-in');
