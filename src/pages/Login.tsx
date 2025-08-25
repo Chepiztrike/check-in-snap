@@ -85,8 +85,7 @@ const Login = () => {
                 <div className="space-y-4">
                   <Button
                     onClick={() => navigate("/auth")}
-                    variant="secondary"
-                    className="w-full flex items-center gap-3 h-auto p-4 justify-center bg-white/10 hover:bg-white/20 border-white/20 text-white hover:text-white"
+                    className="w-full flex items-center gap-3 h-auto p-4 justify-center"
                   >
                     <User className="h-5 w-5" />
                     <div className="text-center">
